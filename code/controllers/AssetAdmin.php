@@ -217,7 +217,7 @@ JS
 			$tabTree->addExtraClass("content-galleryview cms-tabset-icon tree");
 			if($fields->Count() && $folder->exists()) {
 				$tabs->push($tabDetails = new Tab('DetailsView', _t('AssetAdmin.DetailsView', 'Details')));
-				$tabDetails->addExtraClass("content-detailsview cms-tabset-icon edit");
+				$tabDetails->addExtraClass("content-galleryview cms-tabset-icon edit");
 				foreach($fields as $field) {
 					$fields->removeByName($field->getName());
 					$tabDetails->push($field);
