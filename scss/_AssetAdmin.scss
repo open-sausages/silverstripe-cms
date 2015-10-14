@@ -2,7 +2,7 @@
 	.cms-content-fields {
 		.cms-edit-form.AssetAdmin {
 			width: 100%;
-			overflow-y:auto; //adds scrolling only to the datagrid 
+			overflow-y:auto; //adds scrolling only to the datagrid
 		}
 
 		/**
@@ -19,6 +19,10 @@
 	}
 
 	.cms-content-toolbar {
+		position: absolute;
+		top: 0;
+		left: 16px;
+
 		.cms-page-add-button {
 			@include background-image (linear-gradient(lighten(#e6e6e6, 5%), darken(#e6e6e6, 5%)));
 			border-color:#c0c0c2;
@@ -30,7 +34,7 @@
 				text-shadow: white 0 1px 1px;
 			}
 		}
-	}	
+	}
 
 	#Root_TreeView {
 		.cms-tree ul .class-Folder a span.text span.jstree-foldericon {
@@ -60,5 +64,4 @@
 			}
 		}
 	}
-} 
-	
+}
