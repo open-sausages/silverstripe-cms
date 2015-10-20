@@ -47,11 +47,25 @@ class AssetAdmin extends LeftAndMain implements PermissionProvider{
 	 * Return fake-ID "root" if no ID is found (needed to upload files into the root-folder)
 	 */
 	public function currentPageID() {
+		// Use search id if searching folders
+		$params = $this->getRequest()->requestVar('q');
+		if(!empty($params['Folder']) && is_numeric($params['Folder'])) {
+			return $params['Folder'];
+		}
+		// When using folder navigator
+		if(is_numeric($this->getRequest()->requestVar('folder')))	{
+			return $this->getRequest()->requestVar('folder');
+		}
+		// Some other place?
 		if(is_numeric($this->getRequest()->requestVar('ID')))	{
 			return $this->getRequest()->requestVar('ID');
-		} elseif (is_numeric($this->urlParams['ID'])) {
+		}
+		// Directly from url
+		if (is_numeric($this->urlParams['ID'])) {
 			return $this->urlParams['ID'];
-		} elseif(Session::get("{$this->class}.currentPage")) {
+		}
+		// Inherit from session
+		if(Session::get("{$this->class}.currentPage")) {
 			return Session::get("{$this->class}.currentPage");
 		} else {
 			return 0;
@@ -266,7 +280,11 @@ JS
 		// Gallery view
 		$tab = $fields->findOrMakeTab('Root.GalleryView');
 		$tab->push(CompositeField::create($actionButtonsComposite)->addExtraClass('cms-content-toolbar field'));
-		$tab->push(AssetGalleryField::create('Files')->setCurrentPath('')->setLimit(15));
+		$tab->push(
+			AssetGalleryField::create('Files', 'Files', $this->getList())
+				->setCurrentFolderID($folder->ID)
+				->setLimit(15)
+		);
 
 		// Move actions to "details" tab (they don't make sense on list/tree view)
 		$actions = $form->Actions();
