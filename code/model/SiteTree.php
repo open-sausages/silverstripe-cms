@@ -182,7 +182,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	private static $extensions = array(
 		"Hierarchy",
 		"Versioned('Stage', 'Live')",
-		"SiteTreeLinkTracking"
+		"SiteTreeLinkTracking",
+		"HierarchyPermissionExtension"
 	);
 	
 	private static $searchable_fields = array(
@@ -826,9 +827,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * @return bool True if the the member is allowed to do the given action
 	 */
 	public function can($perm, $member = null) {
-		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
-			$member = Member::currentUserID();
-		}
+		if(is_numeric($member)) $member = Member::get()->byID($member);
+		if(!$member) $member = Member::currentUser();
 
 		if($member && Permission::checkMember($member, "ADMIN")) return true;
 		
@@ -865,9 +865,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 			return false;
 		}
 
-		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
-			$member = Member::currentUserID();
-		}
+		if(is_numeric($member)) $member = Member::get()->byID($member);
+		if(!$member) $member = Member::currentUser();
 
 		if($member && Permission::checkMember($member, "ADMIN")) return true;
 		
@@ -879,25 +878,20 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	}
 
 	/**
-	 * This function should return true if the current user can view this page. It can be overloaded to customise the
-	 * security model for an application.
+	 * This function should return true if the current user can view this page.
+	 * It can be overloaded to customise the security model for an application.
 	 *
 	 * Denies permission if any of the following conditions is true:
 	 * - canView() on any extension returns false
-	 * - "CanViewType" directive is set to "Inherit" and any parent page return false for canView()
-	 * - "CanViewType" directive is set to "LoggedInUsers" and no user is logged in
-	 * - "CanViewType" directive is set to "OnlyTheseUsers" and user is not in the given groups
 	 *
 	 * @uses DataExtension->canView()
-	 * @uses ViewerGroups()
 	 *
 	 * @param Member|int $member
 	 * @return bool True if the current user can view this page
 	 */
 	public function canView($member = null) {
-		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
-			$member = Member::currentUserID();
-		}
+		if(is_numeric($member)) $member = Member::get()->byID($member);
+		if(!$member) $member = Member::currentUser();
 
 		// admin override
 		if($member && Permission::checkMember($member, array("ADMIN", "SITETREE_VIEW_ALL"))) return true;
@@ -908,28 +902,6 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 		// Standard mechanism for accepting permission changes from extensions
 		$extended = $this->extendedCan('canView', $member);
 		if($extended !== null) return $extended;
-		
-		// check for empty spec
-		if(!$this->CanViewType || $this->CanViewType == 'Anyone') return true;
-
-		// check for inherit
-		if($this->CanViewType == 'Inherit') {
-			if($this->ParentID) return $this->Parent()->canView($member);
-			else return $this->getSiteConfig()->canViewPages($member);
-		}
-		
-		// check for any logged-in users
-		if($this->CanViewType == 'LoggedInUsers' && $member) {
-			return true;
-		}
-		
-		// check for specific groups
-		if($member && is_numeric($member)) $member = DataObject::get_by_id('Member', $member);
-		if(
-			$this->CanViewType == 'OnlyTheseUsers'
-			&& $member
-			&& $member->inGroups($this->ViewerGroups())
-		) return true;
 		
 		return false;
 	}
@@ -944,31 +916,24 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * - any descendant page returns false for canDelete()
 	 *
 	 * @uses canDelete()
-	 * @uses SiteTreeExtension->canDelete()
 	 * @uses canEdit()
 	 *
 	 * @param Member $member
 	 * @return bool True if the current user can delete this page
 	 */
 	public function canDelete($member = null) {
-		if($member instanceof Member) $memberID = $member->ID;
-		else if(is_numeric($member)) $memberID = $member;
-		else $memberID = Member::currentUserID();
+		if(is_numeric($member)) $member = Member::get()->byID($member);
+		if(!$member) $member = Member::currentUser();
 		
-		if($memberID && Permission::checkMember($memberID, array("ADMIN", "SITETREE_EDIT_ALL"))) {
+		if($member && Permission::checkMember($member, array("ADMIN", "SITETREE_EDIT_ALL"))) {
 			return true;
 		}
 		
 		// Standard mechanism for accepting permission changes from extensions
-		$extended = $this->extendedCan('canDelete', $memberID);
+		$extended = $this->extendedCan('canDelete', $member);
 		if($extended !== null) return $extended;
 				
-		// Regular canEdit logic is handled by can_edit_multiple
-		$results = self::can_delete_multiple(array($this->ID), $memberID);
-		
-		// If this page no longer exists in stage/live results won't contain the page.
-		// Fail-over to false
-		return isset($results[$this->ID]) ? $results[$this->ID] : false;
+		return false;
 	}
 
 	/**
@@ -990,9 +955,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * @return bool True if the current user can create pages on this class.
 	 */
 	public function canCreate($member = null, $context = array()) {
-		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
-			$member = Member::currentUserID();
-		}
+		if(is_numeric($member)) $member = Member::get()->byID($member);
+		if(!$member) $member = Member::currentUser();
 
 		// Check parent (custom canCreate option for SiteTree)
 		// Block children not allowed for this parent type
@@ -1038,33 +1002,20 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * @uses EditorGroups()
 	 * @uses DataExtension->canEdit()
 	 *
-	 * @param Member $member Set to false if you want to explicitly test permissions without a valid user (useful for
-	 *                       unit tests)
+	 * @param Member $member
 	 * @return bool True if the current user can edit this page
 	 */
 	public function canEdit($member = null) {
-		if($member instanceof Member) $memberID = $member->ID;
-		else if(is_numeric($member)) $memberID = $member;
-		else $memberID = Member::currentUserID();
+		if(is_numeric($member)) $member = Member::get()->byID($member);
+		if(!$member) $member = Member::currentUser();
 		
-		if($memberID && Permission::checkMember($memberID, array("ADMIN", "SITETREE_EDIT_ALL"))) return true;
+		if($member && Permission::checkMember($member, array("ADMIN", "SITETREE_EDIT_ALL"))) return true;
 		
 		// Standard mechanism for accepting permission changes from extensions
-		$extended = $this->extendedCan('canEdit', $memberID);
+		$extended = $this->extendedCan('canEdit', $member);
 		if($extended !== null) return $extended;
 
-		if($this->ID) {
-			// Regular canEdit logic is handled by can_edit_multiple
-			$results = self::can_edit_multiple(array($this->ID), $memberID);
-
-			// If this page no longer exists in stage/live results won't contain the page.
-			// Fail-over to false
-			return isset($results[$this->ID]) ? $results[$this->ID] : false;
-			
-		// Default for unsaved pages
-		} else {
-			return $this->getSiteConfig()->canEditPages($member);
-		}
+		return false;
 	}
 
 	/**
@@ -1104,18 +1055,12 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 *
 	 * @param string          $permission    The permission: edit, view, publish, approve, etc.
 	 * @param array           $ids           An array of page IDs
-	 * @param callable|string $batchCallback The function/static method to call to calculate permissions.  Defaults
-	 *                                       to 'SiteTree::can_(permission)_multiple'
+	 * @param callable|string $batchCallback The function/static method to call to calculate permissions.
+	 *                                       Defaults to 'SiteTree::canEditmultiple'
 	 */
 	static public function prepopulate_permission_cache($permission = 'CanEditType', $ids, $batchCallback = null) {
-		if(!$batchCallback) $batchCallback = "SiteTree::can_{$permission}_multiple";
-		
-		if(is_callable($batchCallback)) {
-			call_user_func($batchCallback, $ids, Member::currentUserID(), false);
-		} else {
-			user_error("SiteTree::prepopulate_permission_cache can't calculate '$permission' "
-				. "with callback '$batchCallback'", E_USER_WARNING);
-		}
+		$checker = Injector::inst()->get('HierarchyPermissionChecker');
+		return $checker->prepopulatePermissionCache('SiteTree', $permission, $ids, $batchCallback);
 	}
 
 	/**
@@ -1138,126 +1083,9 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 */
 	public static function batch_permission_check($ids, $memberID, $typeField, $groupJoinTable, $siteConfigMethod,
 												  $globalPermission = null, $useCached = true) {
-		if($globalPermission === NULL) $globalPermission = array('CMS_ACCESS_LeftAndMain', 'CMS_ACCESS_CMSMain');
-
-		// Sanitise the IDs
-		$ids = array_filter($ids, 'is_numeric');
-		
-		// This is the name used on the permission cache
-		// converts something like 'CanEditType' to 'edit'.
-		$cacheKey = strtolower(substr($typeField, 3, -4)) . "-$memberID";
-
-		// Default result: nothing editable
-		$result = array_fill_keys($ids, false);
-		if($ids) {
-
-			// Look in the cache for values
-			if($useCached && isset(self::$cache_permissions[$cacheKey])) {
-				$cachedValues = array_intersect_key(self::$cache_permissions[$cacheKey], $result);
-			
-				// If we can't find everything in the cache, then look up the remainder separately
-				$uncachedValues = array_diff_key($result, self::$cache_permissions[$cacheKey]);
-				if($uncachedValues) {
-					$cachedValues = self::batch_permission_check(array_keys($uncachedValues), $memberID, $typeField, $groupJoinTable, $siteConfigMethod, $globalPermission, false) + $cachedValues;
-				}
-				return $cachedValues;
-			}
-		
-			// If a member doesn't have a certain permission then they can't edit anything
-			if(!$memberID || ($globalPermission && !Permission::checkMember($memberID, $globalPermission))) {
-				return $result;
-			}
-
-			// Placeholder for parameterised ID list
-			$idPlaceholders = DB::placeholders($ids);
-
-			// If page can't be viewed, don't grant edit permissions to do - implement can_view_multiple(), so this can
-			// be enabled
-			//$ids = array_keys(array_filter(self::can_view_multiple($ids, $memberID)));
-		
-			// Get the groups that the given member belongs to
-			$groupIDs = DataObject::get_by_id('Member', $memberID)->Groups()->column("ID");
-			$SQL_groupList = implode(", ", $groupIDs);
-			if (!$SQL_groupList) $SQL_groupList = '0';
-			
-			$combinedStageResult = array();
-
-			foreach(array('Stage', 'Live') as $stage) {
-				// Start by filling the array with the pages that actually exist
-				$table = ($stage=='Stage') ? "SiteTree" : "SiteTree_$stage";
-				
-				if($ids) {
-					$idQuery = "SELECT \"ID\" FROM \"$table\" WHERE \"ID\" IN ($idPlaceholders)";
-					$stageIds = DB::prepared_query($idQuery, $ids)->column();
-				} else {
-					$stageIds = array();
-				}
-				$result = array_fill_keys($stageIds, false);
-				
-				// Get the uninherited permissions
-				$uninheritedPermissions = Versioned::get_by_stage("SiteTree", $stage)
-					->where(array(
-						"(\"$typeField\" = 'LoggedInUsers' OR
-						(\"$typeField\" = 'OnlyTheseUsers' AND \"$groupJoinTable\".\"SiteTreeID\" IS NOT NULL))
-						AND \"SiteTree\".\"ID\" IN ($idPlaceholders)"
-						=> $ids
-					))
-					->leftJoin($groupJoinTable, "\"$groupJoinTable\".\"SiteTreeID\" = \"SiteTree\".\"ID\" AND \"$groupJoinTable\".\"GroupID\" IN ($SQL_groupList)");
-				
-				if($uninheritedPermissions) {
-					// Set all the relevant items in $result to true
-					$result = array_fill_keys($uninheritedPermissions->column('ID'), true) + $result;
-				}
-
-				// Get permissions that are inherited
-				$potentiallyInherited = Versioned::get_by_stage(
-					"SiteTree",
-					$stage,
-					array("\"$typeField\" = 'Inherit' AND \"SiteTree\".\"ID\" IN ($idPlaceholders)" => $ids)
-				);
-
-				if($potentiallyInherited) {
-					// Group $potentiallyInherited by ParentID; we'll look at the permission of all those parents and
-					// then see which ones the user has permission on
-					$groupedByParent = array();
-					foreach($potentiallyInherited as $item) {
-						if($item->ParentID) {
-							if(!isset($groupedByParent[$item->ParentID])) $groupedByParent[$item->ParentID] = array();
-							$groupedByParent[$item->ParentID][] = $item->ID;
-						} else {
-							// Might return different site config based on record context, e.g. when subsites module
-							// is used
-							$siteConfig = $item->getSiteConfig();
-							$result[$item->ID] = $siteConfig->{$siteConfigMethod}($memberID);
-						}
-					}
-
-					if($groupedByParent) {
-						$actuallyInherited = self::batch_permission_check(array_keys($groupedByParent), $memberID, $typeField, $groupJoinTable, $siteConfigMethod);
-						if($actuallyInherited) {
-							$parentIDs = array_keys(array_filter($actuallyInherited));
-							foreach($parentIDs as $parentID) {
-								// Set all the relevant items in $result to true
-								$result = array_fill_keys($groupedByParent[$parentID], true) + $result;
-							}
-						}
-					}
-				}
-				
-				$combinedStageResult = $combinedStageResult + $result;
-				
-			}
-		}
-
-		if(isset($combinedStageResult)) {
-			// Cache the results
- 			if(empty(self::$cache_permissions[$cacheKey])) self::$cache_permissions[$cacheKey] = array();
- 			self::$cache_permissions[$cacheKey] = $combinedStageResult + self::$cache_permissions[$cacheKey];
-
-			return $combinedStageResult;
-		} else {
-			return array();
-		}
+		$checker = Injector::inst()->get('HierarchyPermissionChecker');
+		return $checker->batchPermissionCheck('SiteTree', $ids, $memberID, $typeField, $groupJoinTable,
+			$siteConfigMethod, $globalPermission, $useCached);
 	}
 
 	/**
@@ -1270,7 +1098,9 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 *                         edited
 	 */
 	static public function can_edit_multiple($ids, $memberID, $useCached = true) {
-		return self::batch_permission_check($ids, $memberID, 'CanEditType', 'SiteTree_EditorGroups', 'canEditPages', null, $useCached);
+		$checker = Injector::inst()->get('HierarchyPermissionChecker');
+		return $checker->batchPermissionCheck('SiteTree', $ids, $memberID,
+			'CanEditType', 'SiteTree_EditorGroups', 'canEditPages', null, $useCached);
 	}
 
 	/**
@@ -1282,63 +1112,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * @return array
 	 */
 	static public function can_delete_multiple($ids, $memberID, $useCached = true) {
-		$deletable = array();
-		$result = array_fill_keys($ids, false);
-		$cacheKey = "delete-$memberID";
-		
-		// Look in the cache for values
-		if($useCached && isset(self::$cache_permissions[$cacheKey])) {
-			$cachedValues = array_intersect_key(self::$cache_permissions[$cacheKey], $result);
-			
-			// If we can't find everything in the cache, then look up the remainder separately
-			$uncachedValues = array_diff_key($result, self::$cache_permissions[$cacheKey]);
-			if($uncachedValues) {
-				$cachedValues = self::can_delete_multiple(array_keys($uncachedValues), $memberID, false)
-					+ $cachedValues;
-			}
-			return $cachedValues;
-		}
-
-		// You can only delete pages that you can edit
-		$editableIDs = array_keys(array_filter(self::can_edit_multiple($ids, $memberID)));
-		if($editableIDs) {
-		
-			// You can only delete pages whose children you can delete
-			$editablePlaceholders = DB::placeholders($editableIDs);
-			$childRecords = SiteTree::get()->where(array(
-				"\"SiteTree\".\"ParentID\" IN ($editablePlaceholders)" => $editableIDs
-			));
-			if($childRecords) {
-				$children = $childRecords->map("ID", "ParentID");
-
-				// Find out the children that can be deleted
-				$deletableChildren = self::can_delete_multiple($children->keys(), $memberID);
-				
-				// Get a list of all the parents that have no undeletable children
-				$deletableParents = array_fill_keys($editableIDs, true);
-				foreach($deletableChildren as $id => $canDelete) {
-					if(!$canDelete) unset($deletableParents[$children[$id]]);
-				}
-
-				// Use that to filter the list of deletable parents that have children
-				$deletableParents = array_keys($deletableParents);
-
-				// Also get the $ids that don't have children
-				$parents = array_unique($children->values());
-				$deletableLeafNodes = array_diff($editableIDs, $parents);
-
-				// Combine the two
-				$deletable = array_merge($deletableParents, $deletableLeafNodes);
-
-			} else {
-				$deletable = $editableIDs;
-			}
-		} else {
-			$deletable = array();
-		}
-		
-		// Convert the array of deletable IDs into a map of the original IDs with true/false as the value
-		return array_fill_keys($deletable, true) + array_fill_keys($ids, false);
+		$checker = Injector::inst()->get('HierarchyPermissionChecker');
+		return $checker->canDeleteMultiple('SiteTree', $ids, $memberID, $useCached);
 	}
 
 	/**
@@ -2986,17 +2761,6 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 */
 	public function getParentType() {
 		return $this->ParentID == 0 ? 'root' : 'subpage';
-	}
-
-	/**
-	 * Clear the permissions cache for SiteTree
-	 */
-	public static function reset() {
-		self::$cache_permissions = array();
-	}
-	
-	static public function on_db_reset() {
-		self::$cache_permissions = array();
 	}
 
 }
