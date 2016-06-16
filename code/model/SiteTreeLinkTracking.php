@@ -5,7 +5,12 @@
  * @subpackage model
  */
 
-use SilverStripe\Model\FieldType\DBHTMLText;
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
+
 
 /**
  * Adds tracking of links in any HTMLText fields which reference SiteTree or File items.
@@ -195,7 +200,7 @@ class SiteTreeLinkTracking extends DataExtension {
 	 */
 	public function augmentSyncLinkTracking() {
 		// Skip live tracking
-		if(\Versioned::get_stage() == \Versioned::LIVE) {
+		if(Versioned::get_stage() == Versioned::LIVE) {
 			return;
 		}
 

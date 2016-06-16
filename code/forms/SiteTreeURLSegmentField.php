@@ -10,6 +10,8 @@
  * @subpackage forms
  */
 
+
+use SilverStripe\ORM\DataObject;
 class SiteTreeURLSegmentField extends TextField {
 
 	/**

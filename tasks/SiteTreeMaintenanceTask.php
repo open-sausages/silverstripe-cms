@@ -3,6 +3,9 @@
  * @package cms
  * @subpackage tasks
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
 class SiteTreeMaintenanceTask extends Controller {
 	private static $allowed_actions = array(
 		'*' => 'ADMIN'

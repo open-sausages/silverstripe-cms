@@ -6,6 +6,11 @@
  * @package cms
  * @subpackage model
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataQuery;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataExtension;
 class SiteTreeFolderExtension extends DataExtension {
 
 	/**

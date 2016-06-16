@@ -13,6 +13,10 @@
  * @package cms
  * @subpackage model
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataExtension;
 class SiteTreeFileExtension extends DataExtension {
 
 	private static $belongs_many_many = array(
@@ -109,7 +113,7 @@ class SiteTreeFileExtension extends DataExtension {
 	 */
 	public function onAfterDelete() {
 		// Skip live stage
-		if(\Versioned::get_stage() === Versioned::LIVE) {
+		if(Versioned::get_stage() === Versioned::LIVE) {
 			return;
 		}
 

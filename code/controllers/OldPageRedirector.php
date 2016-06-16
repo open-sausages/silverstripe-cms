@@ -1,5 +1,7 @@
 <?php
 
+
+use SilverStripe\ORM\Queries\SQLSelect;
 class OldPageRedirector extends Extension {
 
 	/**

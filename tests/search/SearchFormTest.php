@@ -8,6 +8,9 @@
  *
  * Because this manipulates the test database in severe ways, I've renamed the test to force it to run last...
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Versioning\Versioned;
 class ZZZSearchFormTest extends FunctionalTest {
 
 	protected static $fixture_file = 'SearchFormTest.yml';

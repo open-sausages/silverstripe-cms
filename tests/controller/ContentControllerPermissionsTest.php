@@ -3,6 +3,8 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
 class ContentControllerPermissionsTest extends FunctionalTest {
 
 	protected $usesDatabase = true;

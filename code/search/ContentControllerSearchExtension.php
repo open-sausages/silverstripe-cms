@@ -5,7 +5,9 @@
  * @package cms
  * @subpackage search
  */
-use SilverStripe\Model\FieldType\DBField;
+
+use SilverStripe\ORM\FieldType\DBField;
+
 class ContentControllerSearchExtension extends Extension {
 	private static $allowed_actions = array(
 		'SearchForm',

@@ -3,6 +3,8 @@
 /**
  * @package cms
  */
+
+use SilverStripe\ORM\DataObject;
 class CMSPagesController extends CMSMain {
 
 	private static $url_segment = 'pages';

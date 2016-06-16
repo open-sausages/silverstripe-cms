@@ -8,6 +8,9 @@
  *
 * @package cms
 */
+
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Versioning\Versioned;
 class VirtualPage extends Page {
 
 	private static $description = 'Displays the content of another page';

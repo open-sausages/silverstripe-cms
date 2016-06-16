@@ -33,6 +33,13 @@
  *
  * @package cms
  */
+
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\HiddenClass;
 class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvider,CMSPreviewable {
 
 	/**
@@ -142,8 +149,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 
 	private static $casting = array(
 		"Breadcrumbs" => "HTMLText",
-		"LastEdited" => "SS_Datetime",
-		"Created" => "SS_Datetime",
+		"LastEdited" => 'SilverStripe\ORM\FieldType\DBDatetime',
+		"Created" => 'SilverStripe\ORM\FieldType\DBDatetime',
 		'Link' => 'Text',
 		'RelativeLink' => 'Text',
 		'AbsoluteLink' => 'Text',
@@ -188,8 +195,8 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	private static $description = 'Generic content page';
 
 	private static $extensions = array(
-		"Hierarchy",
-		"Versioned",
+		'SilverStripe\ORM\Hierarchy\Hierarchy',
+		'SilverStripe\ORM\Versioning\Versioned',
 		"SiteTreeLinkTracking"
 	);
 

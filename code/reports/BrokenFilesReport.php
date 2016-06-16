@@ -4,6 +4,9 @@
  * @package cms
  * @subpackage reports
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Versioning\Versioned;
 class BrokenFilesReport extends SS_Report {
 
 	public function title() {

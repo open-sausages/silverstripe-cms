@@ -3,6 +3,8 @@
 /**
  * Decorates {@see File} with ErrorPage support
  */
+
+use SilverStripe\ORM\DataExtension;
 class ErrorPageFileExtension extends DataExtension {
 
 	/**

@@ -3,6 +3,9 @@
  * @package cms
  * @subpackage tasks
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
 class UpgradeSiteTreePermissionSchemaTask extends BuildTask {
 
 	private static $allowed_actions = array(

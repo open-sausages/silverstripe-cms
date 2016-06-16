@@ -1,4 +1,6 @@
 <?php
+
+use SilverStripe\ORM\Versioning\Versioned;
 class CMSSiteTreeFilterTest extends SapphireTest {
 
 	protected static $fixture_file = 'CMSSiteTreeFilterTest.yml';

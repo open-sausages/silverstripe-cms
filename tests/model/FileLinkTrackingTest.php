@@ -3,6 +3,9 @@
 /**
  * Tests link tracking to files and images.
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DataObject;
 class FileLinkTrackingTest extends SapphireTest {
 	protected static $fixture_file = "FileLinkTrackingTest.yml";
 

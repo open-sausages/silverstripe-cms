@@ -6,6 +6,10 @@
  * @subpackage content
  */
 
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ArrayList;
 class BrokenLinksReport extends SS_Report {
 
 	public function title() {

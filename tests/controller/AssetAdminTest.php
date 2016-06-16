@@ -3,6 +3,8 @@
 /**
  * Tests {@see AssetAdmin}
  */
+
+use SilverStripe\ORM\DataObject;
 class AssetAdminTest extends SapphireTest {
 
 	protected static $fixture_file = 'AssetAdminTest.yml';

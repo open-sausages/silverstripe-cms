@@ -3,6 +3,12 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\ORM\DataExtension;
 class SiteTreeTest extends SapphireTest {
 
 	protected static $fixture_file = 'SiteTreeTest.yml';

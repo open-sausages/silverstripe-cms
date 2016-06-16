@@ -4,6 +4,8 @@
  * @package cms
  * @subpackage model
  */
+
+use SilverStripe\ORM\DataObject;
 interface CurrentPageIdentifier {
 	/**
 	 * Get the current page ID.

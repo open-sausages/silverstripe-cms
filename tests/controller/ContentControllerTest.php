@@ -3,6 +3,8 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
 class ContentControllerTest extends FunctionalTest {
 
 	protected static $fixture_file = 'ContentControllerTest.yml';

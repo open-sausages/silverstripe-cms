@@ -3,6 +3,9 @@
 /**
  * Tests {@see SiteTreeLinkTracking} broken links feature: LinkTracking
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DataExtension;
 class SiteTreeBacklinksTest extends SapphireTest {
 	protected static $fixture_file = "SiteTreeBacklinksTest.yml";
 

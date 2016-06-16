@@ -6,6 +6,8 @@
  * @package cms
  * @subpackage model
  */
+
+use SilverStripe\ORM\DataExtension;
 abstract class SiteTreeExtension extends DataExtension {
 
 	/**

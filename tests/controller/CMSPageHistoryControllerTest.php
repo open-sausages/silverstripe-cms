@@ -5,6 +5,8 @@
  * @subpackage tests
  */
 
+
+use SilverStripe\ORM\Versioning\Versioned;
 class CMSPageHistoryControllerTest extends FunctionalTest {
 
 	protected static $fixture_file = 'CMSPageHistoryControllerTest.yml';

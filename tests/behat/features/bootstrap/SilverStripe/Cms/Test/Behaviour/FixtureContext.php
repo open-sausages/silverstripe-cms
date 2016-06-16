@@ -11,6 +11,8 @@ use Behat\Behat\Context\ClosuredContextInterface,
 	Behat\Mink\Driver\Selenium2Driver,
 	Behat\Gherkin\Node\PyStringNode,
 	Behat\Gherkin\Node\TableNode;
+use SilverStripe\ORM\Versioning\Versioned;
+
 
 /**
  * Context used to create fixtures in the SilverStripe ORM.
@@ -39,7 +41,7 @@ class FixtureContext extends \SilverStripe\BehatExtension\Context\FixtureContext
 			$obj = $this->fixtureFactory->createObject($class, $id, $fields);
 		}
 		$obj->write();
-		$obj->copyVersionToStage(\Versioned::DRAFT, \Versioned::LIVE);
+		$obj->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
 	}
 
 	/**

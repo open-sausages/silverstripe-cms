@@ -6,6 +6,8 @@
  * @todo Test canAddChildren()
  * @todo Test canCreate()
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
 class SiteTreePermissionsTest extends FunctionalTest {
 	protected static $fixture_file = "SiteTreePermissionsTest.yml";
 

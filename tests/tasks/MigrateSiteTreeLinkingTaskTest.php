@@ -3,6 +3,8 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\DataObject;
 class MigrateSiteTreeLinkingTaskTest extends SapphireTest {
 
 	protected static $fixture_file = 'MigrateSiteTreeLinkingTaskTest.yml';

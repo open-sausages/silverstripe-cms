@@ -5,6 +5,8 @@
  * @package cms
  * @subpackage content
  */
+
+use SilverStripe\ORM\DataObject;
 class RedirectorPage extends Page {
 	private static $description = 'Redirects to a different internal page';
 

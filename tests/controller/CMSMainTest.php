@@ -3,6 +3,11 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\HiddenClass;
 class CMSMainTest extends FunctionalTest {
 
 	protected static $fixture_file = 'CMSMainTest.yml';

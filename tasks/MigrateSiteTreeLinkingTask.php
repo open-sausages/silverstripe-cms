@@ -5,6 +5,10 @@
  * @package cms
  * @subpackage tasks
  */
+
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
 class MigrateSiteTreeLinkingTask extends BuildTask {
 
 	protected $title = 'Migrate SiteTree Linking Task';

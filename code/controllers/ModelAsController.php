@@ -6,6 +6,10 @@
  * @package cms
  * @subpackage control
  */
+
+use SilverStripe\ORM\DataModel;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
 class ModelAsController extends Controller implements NestedController {
 	private static $extensions = array('OldPageRedirector');
 

@@ -30,6 +30,8 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
 class RemoveOrphanedPagesTaskTest extends FunctionalTest {
 
 	protected static $fixture_file = 'RemoveOrphanedPagesTaskTest.yml';

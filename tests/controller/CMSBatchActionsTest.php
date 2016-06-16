@@ -4,6 +4,8 @@
 /**
  * Tests CMS Specific subclasses of {@see CMSBatchAction}
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
 class CMSBatchActionsTest extends SapphireTest {
 
 	protected static $fixture_file = 'CMSBatchActionsTest.yml';

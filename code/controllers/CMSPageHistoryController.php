@@ -4,6 +4,9 @@
  * @package cms
  * @subpackage controllers
  */
+
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Versioning\Versioned;
 class CMSPageHistoryController extends CMSMain {
 
 	private static $url_segment = 'pages/history';

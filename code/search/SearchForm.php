@@ -12,6 +12,8 @@
  * @package cms
  * @subpackage search
  */
+
+use SilverStripe\ORM\DB;
 class SearchForm extends Form {
 
 	/**

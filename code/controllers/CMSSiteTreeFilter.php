@@ -13,6 +13,8 @@
  * @package cms
  * @subpackage content
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
 abstract class CMSSiteTreeFilter extends Object implements LeftAndMain_SearchFilter {
 
 	/**

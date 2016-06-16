@@ -9,6 +9,8 @@ use SilverStripe\BehatExtension\Context\SilverStripeContext,
 	SilverStripe\Framework\Test\Behaviour\CmsFormsContext,
 	SilverStripe\Framework\Test\Behaviour\CmsUiContext,
 	SilverStripe\Cms\Test\Behaviour;
+use SilverStripe\ORM\Versioning\Versioned;
+
 
 /**
  * Features context
@@ -41,7 +43,7 @@ class FeatureContext extends \SilverStripe\Framework\Test\Behaviour\FeatureConte
 			$blueprint = \Injector::inst()->create('FixtureBlueprint', $class);
 			$blueprint->addCallback('afterCreate', function($obj, $identifier, &$data, &$fixtures) {
 				/** @var \SiteTree $obj */
-				$obj->copyVersionToStage(\Versioned::DRAFT, \Versioned::LIVE);
+				$obj->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
 			});
 			$factory->define($class, $blueprint);
 		}

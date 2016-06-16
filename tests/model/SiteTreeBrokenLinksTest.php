@@ -5,6 +5,10 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 class SiteTreeBrokenLinksTest extends SapphireTest {
 	protected static $fixture_file = 'SiteTreeBrokenLinksTest.yml';
 

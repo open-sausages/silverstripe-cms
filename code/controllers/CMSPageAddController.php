@@ -1,4 +1,7 @@
 <?php
+
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
 class CMSPageAddController extends CMSPageEditController {
 
 	private static $url_segment = 'pages/add';

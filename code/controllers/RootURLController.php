@@ -3,6 +3,9 @@
  * @package cms
  * @subpackage control
  */
+
+use SilverStripe\ORM\DataModel;
+use SilverStripe\ORM\DB;
 class RootURLController extends Controller {
 
 	/**

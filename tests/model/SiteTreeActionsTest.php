@@ -12,6 +12,9 @@
  * @package cms
  * @subpackage tests
  */
+
+use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\ORM\DB;
 class SiteTreeActionsTest extends FunctionalTest {
 
 	protected static $fixture_file = 'SiteTreeActionsTest.yml';
