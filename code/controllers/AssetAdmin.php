@@ -175,7 +175,7 @@ class AssetAdmin extends LeftAndMain implements PermissionProvider{
 			'Size' => _t('AssetAdmin.SIZE', 'Size'),
 		));
 		$columns->setFieldCasting(array(
-			'Created' => 'SS_Datetime->Nice'
+			'Created' => 'DBDatetime->Nice'
 		));
 		$gridField->setAttribute(
 			'data-url-folder-template',

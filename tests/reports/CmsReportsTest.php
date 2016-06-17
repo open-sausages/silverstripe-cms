@@ -63,7 +63,7 @@ class CmsReportsTest extends SapphireTest {
 		$this->assertContains($after->ID, $r->records(array())->column('ID'));
 		$this->assertNotContains($before->ID, $r->records(array())->column('ID'));
 
-		SS_DateTime::clear_mock_now();
+		DBDatetime::clear_mock_now();
 	}
 
 	/**
