@@ -15,6 +15,8 @@
 
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DB;
+use SilverStripe\Security\Permission;
+
 class SiteTreeActionsTest extends FunctionalTest {
 
 	protected static $fixture_file = 'SiteTreeActionsTest.yml';
@@ -22,7 +24,7 @@ class SiteTreeActionsTest extends FunctionalTest {
 	public function testActionsReadonly() {
 		if(class_exists('SiteTreeCMSWorkflow')) return true;
 
-		$readonlyEditor = $this->objFromFixture('Member', 'cmsreadonlyeditor');
+		$readonlyEditor = $this->objFromFixture('SilverStripe\\Security\\Member', 'cmsreadonlyeditor');
 		$this->session()->inst_set('loggedInAs', $readonlyEditor->ID);
 
 		$page = new SiteTreeActionsTest_Page();
@@ -58,14 +60,14 @@ class SiteTreeActionsTest extends FunctionalTest {
 		$this->assertInstanceOf("SiteTree", $page);
 
 		// Check that someone without the right permission can't delete the page
-		$editor = $this->objFromFixture('Member', 'cmsnodeleteeditor');
+		$editor = $this->objFromFixture('SilverStripe\\Security\\Member', 'cmsnodeleteeditor');
 		$this->session()->inst_set('loggedInAs', $editor->ID);
 
 		$actions = $page->getCMSActions();
 		$this->assertNull($actions->dataFieldByName('action_deletefromlive'));
 
 		// Check that someone with the right permission can delete the page
- 		$this->objFromFixture('Member', 'cmseditor')->logIn();
+ 		$this->objFromFixture('SilverStripe\\Security\\Member', 'cmseditor')->logIn();
 		$actions = $page->getCMSActions();
 		$this->assertNotNull($actions->dataFieldByName('action_deletefromlive'));
 	}
@@ -73,7 +75,7 @@ class SiteTreeActionsTest extends FunctionalTest {
 	public function testActionsPublishedRecord() {
 		if(class_exists('SiteTreeCMSWorkflow')) return true;
 
-		$author = $this->objFromFixture('Member', 'cmseditor');
+		$author = $this->objFromFixture('SilverStripe\\Security\\Member', 'cmseditor');
 		$this->session()->inst_set('loggedInAs', $author->ID);
 
 		$page = new Page();
@@ -95,7 +97,7 @@ class SiteTreeActionsTest extends FunctionalTest {
 	public function testActionsDeletedFromStageRecord() {
 		if(class_exists('SiteTreeCMSWorkflow')) return true;
 
-		$author = $this->objFromFixture('Member', 'cmseditor');
+		$author = $this->objFromFixture('SilverStripe\\Security\\Member', 'cmseditor');
 		$this->session()->inst_set('loggedInAs', $author->ID);
 
 		$page = new Page();
@@ -123,7 +125,7 @@ class SiteTreeActionsTest extends FunctionalTest {
 	public function testActionsChangedOnStageRecord() {
 		if(class_exists('SiteTreeCMSWorkflow')) return true;
 
-		$author = $this->objFromFixture('Member', 'cmseditor');
+		$author = $this->objFromFixture('SilverStripe\\Security\\Member', 'cmseditor');
 		$this->session()->inst_set('loggedInAs', $author->ID);
 
 		$page = new Page();

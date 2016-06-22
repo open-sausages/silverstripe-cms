@@ -29,7 +29,7 @@ class CMSMainTest extends FunctionalTest {
 	function testSiteTreeHints() {
 		$cache = SS_Cache::factory('CMSMain_SiteTreeHints');
 		// Login as user with root creation privileges
-		$user = $this->objFromFixture('Member', 'rootedituser');
+		$user = $this->objFromFixture('SilverStripe\\Security\\Member', 'rootedituser');
 		$user->logIn();
 		$cache->clean(Zend_Cache::CLEANING_MODE_ALL);
 
@@ -104,7 +104,7 @@ class CMSMainTest extends FunctionalTest {
 	public function testPublish() {
 		$page1 = $this->objFromFixture('Page', "page1");
 		$page2 = $this->objFromFixture('Page', "page2");
-		$this->session()->inst_set('loggedInAs', $this->idFromFixture('Member', 'admin'));
+		$this->session()->inst_set('loggedInAs', $this->idFromFixture('SilverStripe\\Security\\Member', 'admin'));
 
 		$response = $this->get('admin/pages/publishall?confirm=1');
 		$this->assertContains(
@@ -214,7 +214,7 @@ class CMSMainTest extends FunctionalTest {
 	 * Test that a draft-deleted page can still be opened in the CMS
 	 */
 	public function testDraftDeletedPageCanBeOpenedInCMS() {
-		$this->session()->inst_set('loggedInAs', $this->idFromFixture('Member', 'admin'));
+		$this->session()->inst_set('loggedInAs', $this->idFromFixture('SilverStripe\\Security\\Member', 'admin'));
 
 		// Set up a page that is delete from live
 		$page = $this->objFromFixture('Page', 'page1');
@@ -272,8 +272,8 @@ class CMSMainTest extends FunctionalTest {
 		$origFollow = $this->autoFollowRedirection;
 		$this->autoFollowRedirection = false;
 
-		$cmsUser = $this->objFromFixture('Member', 'allcmssectionsuser');
-		$rootEditUser = $this->objFromFixture('Member', 'rootedituser');
+		$cmsUser = $this->objFromFixture('SilverStripe\\Security\\Member', 'allcmssectionsuser');
+		$rootEditUser = $this->objFromFixture('SilverStripe\\Security\\Member', 'rootedituser');
 
 		// with insufficient permissions
 		$cmsUser->logIn();
@@ -323,7 +323,7 @@ class CMSMainTest extends FunctionalTest {
 		$origFollow = $this->autoFollowRedirection;
 		$this->autoFollowRedirection = false;
 
-		$adminUser = $this->objFromFixture('Member', 'admin');
+		$adminUser = $this->objFromFixture('SilverStripe\\Security\\Member', 'admin');
 		$adminUser->logIn();
 
 		// Create toplevel page
@@ -394,7 +394,7 @@ class CMSMainTest extends FunctionalTest {
 	public function testBreadcrumbs() {
 		$page3 = $this->objFromFixture('Page', 'page3');
 		$page31 = $this->objFromFixture('Page', 'page31');
-		$adminuser = $this->objFromFixture('Member', 'admin');
+		$adminuser = $this->objFromFixture('SilverStripe\\Security\\Member', 'admin');
 		$this->session()->inst_set('loggedInAs', $adminuser->ID);
 
 		$response = $this->get('admin/pages/edit/show/' . $page31->ID);

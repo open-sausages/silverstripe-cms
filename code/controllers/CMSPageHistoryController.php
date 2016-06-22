@@ -7,6 +7,8 @@
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\Security\Security;
+
 class CMSPageHistoryController extends CMSMain {
 
 	private static $url_segment = 'pages/history';

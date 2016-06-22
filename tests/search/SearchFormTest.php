@@ -136,7 +136,7 @@ class ZZZSearchFormTest extends FunctionalTest {
 			'Page with "Restrict to logged in users" doesnt show without valid login'
 		);
 
-		$member = $this->objFromFixture('Member', 'randomuser');
+		$member = $this->objFromFixture('SilverStripe\\Security\\Member', 'randomuser');
 		$member->logIn();
 		$results = $sf->getResults(null, array('Search'=>'restrictedViewLoggedInUsers'));
 		$this->assertContains(
@@ -161,7 +161,7 @@ class ZZZSearchFormTest extends FunctionalTest {
 			'Page with "Restrict to these users" doesnt show without valid login'
 		);
 
-		$member = $this->objFromFixture('Member', 'randomuser');
+		$member = $this->objFromFixture('SilverStripe\\Security\\Member', 'randomuser');
 		$member->logIn();
 		$results = $sf->getResults(null, array('Search'=>'restrictedViewOnlyWebsiteUsers'));
 		$this->assertNotContains(
@@ -171,7 +171,7 @@ class ZZZSearchFormTest extends FunctionalTest {
 		);
 		$member->logOut();
 
-		$member = $this->objFromFixture('Member', 'websiteuser');
+		$member = $this->objFromFixture('SilverStripe\\Security\\Member', 'websiteuser');
 		$member->logIn();
 		$results = $sf->getResults(null, array('Search'=>'restrictedViewOnlyWebsiteUsers'));
 		$this->assertContains(
@@ -197,7 +197,7 @@ class ZZZSearchFormTest extends FunctionalTest {
 			'Page inheriting "Restrict to loggedin users" doesnt show without valid login'
 		);
 
-		$member = $this->objFromFixture('Member', 'websiteuser');
+		$member = $this->objFromFixture('SilverStripe\\Security\\Member', 'websiteuser');
 		$member->logIn();
 		$results = $sf->getResults(null, array('Search'=>'inheritRestrictedView'));
 		$this->assertContains(

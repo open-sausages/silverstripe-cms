@@ -9,6 +9,8 @@
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\Versioning\Versioned;
+use SilverStripe\Security\Permission;
+
 class CMSBatchAction_Publish extends CMSBatchAction {
 	public function getActionTitle() {
 		return _t('CMSBatchActions.PUBLISH_PAGES', 'Publish');
