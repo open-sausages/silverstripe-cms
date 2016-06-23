@@ -787,7 +787,7 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * @return bool True if the the member is allowed to do the given action
 	 */
 	public function can($perm, $member = null, $context = array()) {
-		if(!$member || !(is_a($member, 'SilverStripe\\Security\\Member')) || is_numeric($member)) {
+		if(!$member || !($member instanceof Member) || is_numeric($member)) {
 			$member = Member::currentUserID();
 		}
 
@@ -826,7 +826,7 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 			return false;
 		}
 
-		if(!$member || !(is_a($member, 'SilverStripe\\Security\\Member')) || is_numeric($member)) {
+		if(!$member || !($member instanceof Member) || is_numeric($member)) {
 			$member = Member::currentUserID();
 		}
 
@@ -861,7 +861,7 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	 * @return bool True if the current user can view this page
 	 */
 	public function canView($member = null) {
-		if(!$member || !(is_a($member, 'SilverStripe\\Security\\Member')) || is_numeric($member)) {
+		if(!$member || !($member instanceof Member) || is_numeric($member)) {
 			$member = Member::currentUserID();
 		}
 

@@ -43,7 +43,7 @@ class ContentController extends Controller {
 	private static $allowed_actions = array(
 		'successfullyinstalled',
 		'deleteinstallfiles', // secured through custom code
-		'SilverStripe\\Security\\LoginForm'
+		'LoginForm'
 	);
 
 	/**
@@ -124,7 +124,7 @@ class ContentController extends Controller {
 		if($this->redirectedTo()) return;
 
 		// Check page permissions
-		if($this->dataRecord && $this->URLSegment != 'SilverStripe\\Security\\Security' && !$this->dataRecord->canView()) {
+		if($this->dataRecord && $this->URLSegment != 'Security' && !$this->dataRecord->canView()) {
 			return Security::permissionFailure($this);
 		}
 
@@ -299,7 +299,7 @@ class ContentController extends Controller {
 				$logInMessage = sprintf(
 					'%s - <a href="%s">%s</a>' ,
 					_t('ContentController.NOTLOGGEDIN', 'Not logged in') ,
-					Config::inst()->get('SilverStripe\\Security\\Security', 'login_url'),
+					Security::config()->login_url,
 					_t('ContentController.LOGIN', 'Login') ."</a>"
 				);
 			}
