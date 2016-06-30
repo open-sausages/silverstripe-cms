@@ -11,7 +11,21 @@
 		<% if $Fields.hasTabset %>
 		<% with $Fields.fieldByName('Root') %>
 		<div class="cms-content-header-tabs">
-			<button id="filters-button" class="icon-button font-icon-search no-text" title="<% _t('CMSPagesController_Tools_ss.FILTER', 'Filter') %>"></button>
+
+			<div class="search">
+				<!-- Open search trigger -->
+				<button for="Form_Search_Example" class="btn no-text font-icon-search search__trigger" type="button" title="search"></button>
+
+				<!-- Actual search fields -->
+				<div id="collapseExample" class="search__group">
+					<input type="text" name="q[Term]" placeholder="Search" class="form-control search__content-field" id="Form_Search_Example">
+					<button id="filters-button" class="search__filter-trigger" title="<% _t('CMSPagesController_Tools_ss.FILTER', 'Filter') %>"></button>
+					<button class="btn btn-primary search__submit" title="<% _t('CMSPagesController_Tools_ss.FILTER', 'Filter') %>">Go</button>
+
+					<!-- Filter panel -->
+					$Top.Tools
+				</div>
+			</div>
 
 			<div class="icon-button-group">
 				<ul class="cms-tabset-nav-primary ss-tabset">
@@ -26,8 +40,6 @@
 	</div>
 
 	<div class="cms-content-fields center ui-widget-content cms-panel-padded" data-layout-type="border">
-		$Top.Tools
-
 		<div class="cms-content-view">
 			$forTemplate
 		</div>
@@ -35,3 +47,19 @@
 	<% end_with %>
 
 </div>
+
+<!-- TEMP Javasctript for search panel -->
+<script type="text/javascript">
+(function($){
+	$(document).click(function(e) {
+		if (!$(e.target).is('.search *')) {
+			$('.search').removeClass('search--active');
+		}
+	});
+
+	$('.search__trigger').on('click', function() {
+		$('.search').addClass('search--active');
+		$('.search__content-field').focus();
+	});
+})(jQuery);
+</script>
