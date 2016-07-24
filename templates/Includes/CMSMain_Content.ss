@@ -1,26 +1,27 @@
 <div id="pages-controller-cms-content" class="has-panel cms-content center cms-tabset $BaseCSSClasses" data-layout-type="border" data-pjax-fragment="Content" data-ignore-tab-state="true">
 
 	<div class="cms-content-header north">
-		
 
 		<div class="cms-content-header-nav">
+			<a href="admin/pages" class="btn btn-secondary panel-back font-icon-left-open-big btn--icon-md btn--no-text hidden-lg-up"><span class="sr-only">Back to Pages</span></a>
+
 			<% include CMSBreadcrumbs %>
 
 			<div class="cms-content-header-tabs">
 				<ul class="cms-tabset-nav-primary">
 					<li class="content-treeview<% if class == 'CMSPageEditController' %> ui-tabs-active<% end_if %>">
-						<a href="$LinkPageEdit" class="cms-panel-link" title="Form_EditForm" data-href="$LinkPageEdit">
-							<% _t('CMSMain.TabContent', 'Content') %>
+						<a href="$LinkPageEdit" class="cms-panel-link font-icon-edit-write btn--icon-md" title="Form_EditForm" data-href="$LinkPageEdit">
+							<span class="tab-text"><% _t('CMSMain.TabContent', 'Content') %></span>
 						</a>
 					</li>
 					<li class="content-listview<% if class == 'CMSPageSettingsController' %> ui-tabs-active<% end_if %>">
-						<a href="$LinkPageSettings" class="cms-panel-link" title="Form_EditForm" data-href="$LinkPageSettings">
-							<% _t('CMSMain.TabSettings', 'Settings') %>
+						<a href="$LinkPageSettings" class="cms-panel-link font-icon-cog btn--icon-md" title="Form_EditForm" data-href="$LinkPageSettings">
+							<span class="tab-text"><% _t('CMSMain.TabSettings', 'Settings') %></span>
 						</a>
 					</li>
 					<li class="content-listview<% if class == 'CMSPageHistoryController' %> ui-tabs-active<% end_if %>">
-						<a href="$LinkPageHistory" class="cms-panel-link" title="Form_EditForm" data-href="$LinkPageHistory">
-							<% _t('CMSMain.TabHistory', 'History') %>
+						<a href="$LinkPageHistory" class="cms-panel-link font-icon-back-in-time btn--icon-md" title="Form_EditForm" data-href="$LinkPageHistory">
+							<span class="tab-text"><% _t('CMSMain.TabHistory', 'History') %></span>
 						</a>
 					</li>
 				</ul>

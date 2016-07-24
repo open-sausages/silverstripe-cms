@@ -2,6 +2,8 @@
 
 	<div class="cms-content-header north">
 		<div class="cms-content-header-info">
+            <button class="btn btn-primary navbar-toggler font-icon-menu btn--icon-xl btn--no-text hidden-lg-up" type="button" data-toggle="collapse" data-target="#cms-menu" aria-controls="cms-menu"><span class="sr-only">Toggle navigation</span></button>
+
 			<% include CMSBreadcrumbs %>
 		</div>
 
