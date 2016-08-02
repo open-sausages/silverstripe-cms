@@ -19,7 +19,7 @@
 				<!-- Actual search fields -->
 				<div id="collapseExample" class="search__group">
 					<input type="text" name="q[Term]" placeholder="Search" class="form-control search__content-field" id="Form_Search_Example">
-					<button id="filters-button" class="search__filter-trigger" title="<% _t('CMSPagesController_Tools_ss.FILTER', 'Filter') %>"></button>
+					<button id="filters-button" class="search__filter-trigger font-icon-down-open btn-secondary btn--no-text" title="<% _t('CMSPagesController_Tools_ss.FILTER', 'Filter') %>"></button>
 					<button class="btn btn-primary search__submit" title="<% _t('CMSPagesController_Tools_ss.FILTER', 'Filter') %>">Go</button>
 
 					<!-- Filter panel -->
