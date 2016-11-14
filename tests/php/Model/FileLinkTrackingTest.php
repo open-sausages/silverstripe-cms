@@ -191,7 +191,7 @@ class FileLinkTrackingTest extends SapphireTest {
 
 		// TODO Workaround for bug in DataObject->getChangedFields(), which returns stale data,
 		// and influences File->updateFilesystem()
-		$file = DataObject::get_by_id('SilverStripe\\Assets\\File', $file->ID);
+		$file = DataObject::get_by_id(File::class, $file->ID);
 		$file->Name = 'renamed-test-file-second-time.jpg';
 		$file->write();
 		$file->publishRecursive();

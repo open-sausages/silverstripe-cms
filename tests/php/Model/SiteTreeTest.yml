@@ -113,7 +113,7 @@ Page:
     Title: 'Breadcrumbs 5'
     Parent: =>Page.breadcrumbs4
 
-SiteTreeTest_Conflicted:
+SilverStripe\CMS\Tests\Model\SiteTreeTest\Conflicted:
   parent:
     Title: Parent
 

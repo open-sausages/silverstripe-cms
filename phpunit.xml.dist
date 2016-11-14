@@ -19,7 +19,7 @@
 <phpunit bootstrap="tests/bootstrap.php" colors="true">
 
 	<testsuite name="Default">
-		<directory>tests</directory>
+		<directory>tests/php</directory>
 	</testsuite>
 
 	<listeners>

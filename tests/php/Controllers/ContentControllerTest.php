@@ -2,7 +2,7 @@
 
 namespace SilverStripe\CMS\Tests\Controllers;
 
-
+use SilverStripe\Dev\Debug;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\CMS\Model\SiteTree;
@@ -12,13 +12,7 @@ use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Dev\FunctionalTest;
 use Page;
-use Page_Controller;
 
-
-/**
- * @package cms
- * @subpackage tests
- */
 class ContentControllerTest extends FunctionalTest {
 
 	protected static $fixture_file = 'ContentControllerTest.yml';
@@ -27,13 +21,19 @@ class ContentControllerTest extends FunctionalTest {
 
 	protected static $disable_themes = true;
 
+	protected $extraDataObjects = [
+		ContentControllerTest\Test_Page::class,
+		ContentControllerTest\TestPage::class,
+		ContentControllerTest\TestPageWithoutController::class,
+	];
+
 	/**
 	 * Test that nested pages, basic actions, and nested/non-nested URL switching works properly
 	 */
 
 	public function testNestedPages() {
 		RootURLController::reset();
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'nested_urls', true);
+		Config::inst()->update(SiteTree::class, 'nested_urls', true);
 
 		$this->assertEquals('Home Page', $this->get('/')->getBody());
 		$this->assertEquals('Home Page', $this->get('/home/index/')->getBody());
@@ -69,7 +69,7 @@ class ContentControllerTest extends FunctionalTest {
 	public function testChildrenOf() {
 		$controller = new ContentController();
 
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'nested_urls', true);
+		Config::inst()->update(SiteTree::class, 'nested_urls', true);
 
 		$this->assertEquals(1, $controller->ChildrenOf('/')->Count());
 		$this->assertEquals(1, $controller->ChildrenOf('/home/')->Count());
@@ -85,7 +85,7 @@ class ContentControllerTest extends FunctionalTest {
 	}
 
 	public function testDeepNestedURLs() {
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'nested_urls', true);
+		Config::inst()->update(SiteTree::class, 'nested_urls', true);
 
 		$page = new Page();
 		$page->URLSegment = 'base-page';
@@ -94,7 +94,7 @@ class ContentControllerTest extends FunctionalTest {
 		for($i = 0; $i < 10; $i++) {
 			$parentID = $page->ID;
 
-			$page = new ContentControllerTest_Page();
+			$page = new ContentControllerTest\Test_Page();
 			$page->ParentID = $parentID;
 			$page->Title      = "Page Level $i";
 			$page->URLSegment = "level-$i";
@@ -156,19 +156,19 @@ class ContentControllerTest extends FunctionalTest {
 	public function testGetViewer() {
 
 		$self = $this;
-		$this->useTestTheme(dirname(__FILE__), 'controllertest', function() use ($self) {
+		$this->useTestTheme(__DIR__, 'controllertest', function() use ($self) {
 
 			// Test a page without a controller (ContentControllerTest_PageWithoutController.ss)
-			$page = new ContentControllerTestPageWithoutController();
+			$page = new ContentControllerTest\TestPageWithoutController();
 			$page->URLSegment = "test";
 			$page->write();
 			$page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
 
 			$response = $self->get($page->RelativeLink());
-			$self->assertEquals("ContentControllerTestPageWithoutController", trim($response->getBody()));
+			$self->assertEquals("TestPageWithoutController", trim($response->getBody()));
 
 			// // This should fall over to user Page.ss
-			$page = new ContentControllerTestPage();
+			$page = new ContentControllerTest\TestPage();
 			$page->URLSegment = "test";
 			$page->write();
 			$page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
@@ -178,13 +178,13 @@ class ContentControllerTest extends FunctionalTest {
 
 
 			// Test that the action template is rendered.
-			$page = new ContentControllerTestPage();
+			$page = new ContentControllerTest\TestPage();
 			$page->URLSegment = "page-without-controller";
 			$page->write();
 			$page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
 
 			$response = $self->get($page->RelativeLink("test"));
-			$self->assertEquals("ContentControllerTestPage_test", trim($response->getBody()));
+			$self->assertEquals("TestPage_test", trim($response->getBody()));
 
 			// Test that an action without a template will default to the index template, which is
 			// to say the default Page.ss template
@@ -195,42 +195,18 @@ class ContentControllerTest extends FunctionalTest {
 			// correct parent template
 			$controller = new ContentController($page);
 			$viewer = $controller->getViewer('test');
-			$templateList = array('ContentControllerTestPage_test', 'Page');
-			$self->assertEquals(dirname(__FILE__).'/themes/controllertest/templates/ContentControllerTestPage_test.ss', $viewer->templates()['main']);
+			$templateList = [
+				ContentControllerTest\TestPage::class . '_test',
+				'Page'
+			];
+			Debug::dump($viewer->templates());
+			$self->assertEquals(
+				__DIR__ . '/themes/controllertest/templates/'.ContentControllerTest\TestPage::class.'_test.ss',
+				$viewer->templates()['main']
+			);
 		});
 	}
 
 }
 
-class ContentControllerTest_Page extends Page {  }
-
-class ContentControllerTest_Page_Controller extends Page_Controller {
-
-	private static $allowed_actions = array (
-		'second_index'
-	);
-
-	public function index() {
-		return $this->Title;
-	}
-
-	public function second_index() {
-		return $this->index();
-	}
-
-}
-
 // For testing templates
-class ContentControllerTestPageWithoutController extends Page { }
-
-class ContentControllerTestPage extends Page { }
-class ContentControllerTestPage_Controller extends Page_Controller {
-	private static $allowed_actions = array(
-		"test",
-		"testwithouttemplate"
-	);
-
-	function testwithouttemplate() {
-		return array();
-	}
-}

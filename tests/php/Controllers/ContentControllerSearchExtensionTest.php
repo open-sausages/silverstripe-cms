@@ -2,7 +2,8 @@
 
 namespace SilverStripe\CMS\Tests\Controllers;
 
-
+use SilverStripe\CMS\Search\SearchForm;
+use SilverStripe\ORM\Connect\MySQLSchemaManager;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\ORM\Search\FulltextSearchable;
@@ -10,9 +11,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
 use Page;
-
-
-
 
 class ContentControllerSearchExtensionTest extends SapphireTest {
 
@@ -25,13 +23,18 @@ class ContentControllerSearchExtensionTest extends SapphireTest {
 		$controller = new ContentController($page);
 		$form = $controller->SearchForm();
 
-		if (get_class($form) == 'SilverStripe\\CMS\\Search\\SearchForm') $this->assertEquals(array('SilverStripe\\Assets\\File'), $form->getClassesToSearch());
+		if (get_class($form) == SearchForm::class) {
+			$this->assertEquals(
+				array(File::class),
+				$form->getClassesToSearch()
+			);
+		}
 	}
 
 	public function setUpOnce() {
 		parent::setUpOnce();
 
-		FulltextSearchable::enable('SilverStripe\\Assets\\File');
+		FulltextSearchable::enable(File::class);
 	}
 
 	/**
@@ -42,8 +45,12 @@ class ContentControllerSearchExtensionTest extends SapphireTest {
 	public function tearDownOnce() {
 		parent::tearDownOnce();
 
-		Config::inst()->update('SilverStripe\\Assets\\File', 'create_table_options', array('SilverStripe\ORM\Connect\MySQLDatabase' => 'ENGINE=InnoDB'));
-		File::remove_extension('SilverStripe\\ORM\\Search\\FulltextSearchable');
+		Config::inst()->update(
+			File::class,
+			'create_table_options',
+			array(MySQLSchemaManager::ID => 'ENGINE=InnoDB')
+		);
+		File::remove_extension(FulltextSearchable::class);
 	}
 
 }

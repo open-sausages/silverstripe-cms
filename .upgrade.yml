@@ -65,25 +65,25 @@ mappings:
   SiteTreeMaintenanceTask: SilverStripe\CMS\Tasks\SiteTreeMaintenanceTask
   CMSBatchActionsTest: SilverStripe\CMS\Tests\Controllers\CMSBatchActionsTest
   CMSMainTest: SilverStripe\CMS\Tests\Controllers\CMSMainTest
-  CMSMainTest_ClassA: SilverStripe\CMS\Tests\Controllers\CMSMainTest_ClassA
-  CMSMainTest_ClassB: SilverStripe\CMS\Tests\Controllers\CMSMainTest_ClassB
-  CMSMainTest_NotRoot: SilverStripe\CMS\Tests\Controllers\CMSMainTest_NotRoot
-  CMSMainTest_HiddenClass: SilverStripe\CMS\Tests\Controllers\CMSMainTest_HiddenClass
+  CMSMainTest_ClassA: SilverStripe\CMS\Tests\Controllers\CMSMainTest\CMSMainTest_ClassA
+  CMSMainTest_ClassB: SilverStripe\CMS\Tests\Controllers\CMSMainTest\CMSMainTest_ClassB
+  CMSMainTest_NotRoot: SilverStripe\CMS\Tests\Controllers\CMSMainTest\CMSMainTest_NotRoot
+  CMSMainTest_HiddenClass: SilverStripe\CMS\Tests\Controllers\CMSMainTest\CMSMainTest_HiddenClass
   CMSPageHistoryControllerTest: SilverStripe\CMS\Tests\Controllers\CMSPageHistoryControllerTest
   CMSSiteTreeFilterTest: SilverStripe\CMS\Tests\Controllers\CMSSiteTreeFilterTest
   ContentControllerPermissionsTest: SilverStripe\CMS\Tests\Controllers\ContentControllerPermissionsTest
   ContentControllerSearchExtensionTest: SilverStripe\CMS\Tests\Controllers\ContentControllerSearchExtensionTest
   ContentControllerTest: SilverStripe\CMS\Tests\Controllers\ContentControllerTest
-  ContentControllerTest_Page: SilverStripe\CMS\Tests\Controllers\ContentControllerTest_Page
-  ContentControllerTest_Page_Controller: SilverStripe\CMS\Tests\Controllers\ContentControllerTest_Page_Controller
-  ContentControllerTestPageWithoutController: SilverStripe\CMS\Tests\Controllers\ContentControllerTestPageWithoutController
-  ContentControllerTestPage: SilverStripe\CMS\Tests\Controllers\ContentControllerTestPage
-  ContentControllerTestPage_Controller: SilverStripe\CMS\Tests\Controllers\ContentControllerTestPage_Controller
+  ContentControllerTest_Page: SilverStripe\CMS\Tests\Controllers\ContentControllerTest\ContentControllerTest_Page
+  ContentControllerTest_Page_Controller: SilverStripe\CMS\Tests\Controllers\ContentControllerTest\ContentControllerTest_Page_Controller
+  ContentControllerTestPageWithoutController: SilverStripe\CMS\Tests\Controllers\ContentControllerTest\ContentControllerTestPageWithoutController
+  ContentControllerTestPage: SilverStripe\CMS\Tests\Controllers\ContentControllerTest\ContentControllerTestPage
+  ContentControllerTestPage_Controller: SilverStripe\CMS\Tests\Controllers\ContentControllerTest\ContentControllerTestPage_Controller
   ModelAsControllerTest: SilverStripe\CMS\Tests\Controllers\ModelAsControllerTest
   RootURLControllerTest: SilverStripe\CMS\Tests\Controllers\RootURLControllerTest
   SilverStripeNavigatorTest: SilverStripe\CMS\Tests\Controllers\SilverStripeNavigatorTest
-  SilverStripeNavigatorTest_TestItem: SilverStripe\CMS\Tests\Controllers\SilverStripeNavigatorTest_TestItem
-  SilverStripeNavigatorTest_ProtectedTestItem: SilverStripe\CMS\Tests\Controllers\SilverStripeNavigatorTest_ProtectedTestItem
+  SilverStripeNavigatorTest_TestItem: SilverStripe\CMS\Tests\Controllers\SilverStripeNavigatorTest\SilverStripeNavigatorTest_TestItem
+  SilverStripeNavigatorTest_ProtectedTestItem: SilverStripe\CMS\Tests\Controllers\SilverStripeNavigatorTest\SilverStripeNavigatorTest_ProtectedTestItem
   ErrorPageFileExtensionTest: SilverStripe\CMS\Tests\Model\ErrorPageFileExtensionTest
   ErrorPageTest: SilverStripe\CMS\Tests\Model\ErrorPageTest
   FileLinkTrackingTest: SilverStripe\CMS\Tests\Model\FileLinkTrackingTest
@@ -100,22 +100,22 @@ mappings:
   SiteTreeTest: SilverStripe\CMS\Tests\Model\SiteTreeTest
   SiteTreeTest_PageNode: SilverStripe\CMS\Tests\Model\SiteTreeTest_PageNode
   SiteTreeTest_PageNode_Controller: SilverStripe\CMS\Tests\Model\SiteTreeTest_PageNode_Controller
-  SiteTreeTest_Conflicted: SilverStripe\CMS\Tests\Model\SiteTreeTest_Conflicted
-  SiteTreeTest_Conflicted_Controller: SilverStripe\CMS\Tests\Model\SiteTreeTest_Conflicted_Controller
-  SiteTreeTest_NullHtmlCleaner: SilverStripe\CMS\Tests\Model\SiteTreeTest_NullHtmlCleaner
-  SiteTreeTest_ClassA: SilverStripe\CMS\Tests\Model\SiteTreeTest_ClassA
-  SiteTreeTest_ClassB: SilverStripe\CMS\Tests\Model\SiteTreeTest_ClassB
+  SiteTreeTest_Conflicted: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_Conflicted
+  SiteTreeTest_Conflicted_Controller: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_Conflicted_Controller
+  SiteTreeTest_NullHtmlCleaner: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_NullHtmlCleaner
+  SiteTreeTest_ClassA: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassA
+  SiteTreeTest_ClassB: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassB
   SiteTreeTest_ClassC: SilverStripe\CMS\Tests\Model\SiteTreeTest_ClassC
-  SiteTreeTest_ClassD: SilverStripe\CMS\Tests\Model\SiteTreeTest_ClassD
-  SiteTreeTest_ClassE: SilverStripe\CMS\Tests\Model\SiteTreeTest_ClassE
-  SiteTreeTest_ClassCext: SilverStripe\CMS\Tests\Model\SiteTreeTest_ClassCext
-  SiteTreeTest_NotRoot: SilverStripe\CMS\Tests\Model\SiteTreeTest_NotRoot
-  SiteTreeTest_StageStatusInherit: SilverStripe\CMS\Tests\Model\SiteTreeTest_StageStatusInherit
-  SiteTreeTest_Extension: SilverStripe\CMS\Tests\Model\SiteTreeTest_Extension
-  SiteTreeTest_AdminDenied: SilverStripe\CMS\Tests\Model\SiteTreeTest_AdminDenied
-  SiteTreeTest_ExtensionA: SilverStripe\CMS\Tests\Model\SiteTreeTest_ExtensionA
-  SiteTreeTest_ExtensionB: SilverStripe\CMS\Tests\Model\SiteTreeTest_ExtensionB
-  SiteTreeTest_AdminDeniedExtension: SilverStripe\CMS\Tests\Model\SiteTreeTest_AdminDeniedExtension
+  SiteTreeTest_ClassD: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassD
+  SiteTreeTest_ClassE: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassE
+  SiteTreeTest_ClassCext: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassCext
+  SiteTreeTest_NotRoot: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_NotRoot
+  SiteTreeTest_StageStatusInherit: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_StageStatusInherit
+  SiteTreeTest_Extension: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_Extension
+  SiteTreeTest_AdminDenied: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_AdminDenied
+  SiteTreeTest_ExtensionA: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ExtensionA
+  SiteTreeTest_ExtensionB: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ExtensionB
+  SiteTreeTest_AdminDeniedExtension: SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_AdminDeniedExtension
   VirtualPageTest: SilverStripe\CMS\Tests\Model\VirtualPageTest
   VirtualPageTest_ClassA: SilverStripe\CMS\Tests\Model\VirtualPageTest_ClassA
   VirtualPageTest_ClassA_Controller: SilverStripe\CMS\Tests\Model\VirtualPageTest_ClassA_Controller

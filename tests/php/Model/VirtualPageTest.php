@@ -3,6 +3,9 @@
 namespace SilverStripe\CMS\Tests\Model;
 
 
+use SilverStripe\CMS\Tests\Model\SiteTreeTest\ClassC;
+use SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassA;
+use SilverStripe\CMS\Tests\Model\SiteTreeTest\SiteTreeTest_ClassB;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DB;
@@ -37,11 +40,11 @@ class VirtualPageTest extends FunctionalTest {
 	);
 
 	protected $illegalExtensions = array(
-		'SilverStripe\\CMS\\Model\\SiteTree' => array('SiteTreeSubsites', 'Translatable')
+		SiteTree::class => array('SiteTreeSubsites', 'Translatable')
 	);
 
 	protected $requiredExtensions = array(
-		'SilverStripe\\CMS\\Model\\SiteTree' => array('VirtualPageTest_PageExtension')
+		SiteTree::class => array('VirtualPageTest_PageExtension')
 	);
 
 	public function setUp() {
@@ -216,7 +219,7 @@ class VirtualPageTest extends FunctionalTest {
 		// Delete the source page semi-manually, without triggering
 		// the cascade publish back to the virtual page.
 		Versioned::set_stage(Versioned::LIVE);
-		$livePage = Versioned::get_by_stage('SilverStripe\\CMS\\Model\\SiteTree', Versioned::LIVE)->byID($pID);
+		$livePage = Versioned::get_by_stage(SiteTree::class, Versioned::LIVE)->byID($pID);
 		$livePage->delete();
 		Versioned::set_stage(Versioned::DRAFT);
 
@@ -340,16 +343,16 @@ class VirtualPageTest extends FunctionalTest {
 
 		// The draft VP still has the CopyContentFromID link
 		$vp->flushCache();
-		$vp = DataObject::get_by_id('SilverStripe\\CMS\\Model\\SiteTree', $vp->ID);
+		$vp = DataObject::get_by_id(SiteTree::class, $vp->ID);
 		$this->assertEquals($p->ID, $vp->CopyContentFromID);
 
-		$vpLive = Versioned::get_one_by_stage('SilverStripe\\CMS\\Model\\SiteTree', 'Live', '"SiteTree"."ID" = ' . $vp->ID);
+		$vpLive = Versioned::get_one_by_stage(SiteTree::class, 'Live', '"SiteTree"."ID" = ' . $vp->ID);
 		$this->assertNull($vpLive);
 
 		// Delete from draft, confirm that the virtual page has a broken link on the draft site
 		$p->delete();
 		$vp->flushCache();
-		$vp = DataObject::get_by_id('SilverStripe\\CMS\\Model\\SiteTree', $vp->ID);
+		$vp = DataObject::get_by_id(SiteTree::class, $vp->ID);
 		$this->assertEquals(1, $vp->HasBrokenLink);
 	}
 
@@ -371,19 +374,19 @@ class VirtualPageTest extends FunctionalTest {
 		$pID = $p->ID;
 		$p->delete();
 		$vp->flushCache();
-		$vp = DataObject::get_by_id('SilverStripe\\CMS\\Model\\SiteTree', $vp->ID);
+		$vp = DataObject::get_by_id(SiteTree::class, $vp->ID);
 		$this->assertEquals(1, $vp->HasBrokenLink);
 
 		// Delete the source page form live, confirm that the virtual page has also been unpublished
-		$pLive = Versioned::get_one_by_stage('SilverStripe\\CMS\\Model\\SiteTree', 'Live', '"SiteTree"."ID" = ' . $pID);
+		$pLive = Versioned::get_one_by_stage(SiteTree::class, 'Live', '"SiteTree"."ID" = ' . $pID);
 		$this->assertTrue($pLive->doUnpublish());
-		$vpLive = Versioned::get_one_by_stage('SilverStripe\\CMS\\Model\\SiteTree', 'Live', '"SiteTree"."ID" = ' . $vp->ID);
+		$vpLive = Versioned::get_one_by_stage(SiteTree::class, 'Live', '"SiteTree"."ID" = ' . $vp->ID);
 		$this->assertNull($vpLive);
 
 		// Delete from draft, confirm that the virtual page has a broken link on the draft site
 		$pLive->delete();
 		$vp->flushCache();
-		$vp = DataObject::get_by_id('SilverStripe\\CMS\\Model\\SiteTree', $vp->ID);
+		$vp = DataObject::get_by_id(SiteTree::class, $vp->ID);
 		$this->assertEquals(1, $vp->HasBrokenLink);
 	}
 
@@ -398,7 +401,7 @@ class VirtualPageTest extends FunctionalTest {
 		$classBVirtual = new VirtualPage();
 		$classBVirtual->CopyContentFromID = $classB->ID;
 		$classBVirtual->write();
-		$classC = new SiteTreeTest_ClassC();
+		$classC = new ClassC();
 		$classC->write();
 		$classCVirtual = new VirtualPage();
 		$classCVirtual->CopyContentFromID = $classC->ID;
@@ -516,7 +519,7 @@ class VirtualPageTest extends FunctionalTest {
 		$nonVirtual->write(); // not publishing the page type change here
 
 		// Stage record is changed to the new type and no longer acts as a virtual page
-		$nonVirtualStage = Versioned::get_one_by_stage('SilverStripe\\CMS\\Model\\SiteTree', 'Stage', '"SiteTree"."ID" = ' . $nonVirtual->ID, false);
+		$nonVirtualStage = Versioned::get_one_by_stage(SiteTree::class, 'Stage', '"SiteTree"."ID" = ' . $nonVirtual->ID, false);
 		$this->assertNotNull($nonVirtualStage);
 		$this->assertEquals('VirtualPageTest_ClassA', $nonVirtualStage->ClassName);
 		$this->assertEquals('changed on new type', $nonVirtualStage->MySharedNonVirtualField);
@@ -525,7 +528,7 @@ class VirtualPageTest extends FunctionalTest {
 		);
 
 		// Virtual page on live keeps working as it should
-		$virtualLive = Versioned::get_one_by_stage('SilverStripe\\CMS\\Model\\SiteTree', 'Live', '"SiteTree_Live"."ID" = ' . $virtual->ID, false);
+		$virtualLive = Versioned::get_one_by_stage(SiteTree::class, 'Live', '"SiteTree_Live"."ID" = ' . $virtual->ID, false);
 		$this->assertNotNull($virtualLive);
 		$this->assertEquals('VirtualPageTest_VirtualPageSub', $virtualLive->ClassName);
 		$this->assertEquals('virtual published field', $virtualLive->MySharedNonVirtualField);
@@ -538,7 +541,7 @@ class VirtualPageTest extends FunctionalTest {
 		$page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
 
 		// Virtual page only notices changes to virtualised fields (Title)
-		$virtualLive = Versioned::get_one_by_stage('SilverStripe\\CMS\\Model\\SiteTree', 'Live', '"SiteTree_Live"."ID" = ' . $virtual->ID, false);
+		$virtualLive = Versioned::get_one_by_stage(SiteTree::class, 'Live', '"SiteTree_Live"."ID" = ' . $virtual->ID, false);
 		$this->assertEquals('virtual published field', $virtualLive->MySharedNonVirtualField);
 		$this->assertEquals('title changed on original', $virtualLive->Title);
 	}

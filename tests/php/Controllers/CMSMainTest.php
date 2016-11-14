@@ -2,15 +2,17 @@
 
 namespace SilverStripe\CMS\Tests\Controllers;
 
-
+use SilverStripe\CMS\Controllers\CMSSiteTreeFilter_PublishedPages;
+use SilverStripe\CMS\Controllers\CMSSiteTreeFilter_StatusDeletedPages;
+use SilverStripe\CMS\Controllers\CMSSiteTreeFilter_StatusRemovedFromDraftPages;
+use SilverStripe\Forms\Form;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\Versioning\Versioned;
-use SilverStripe\ORM\HiddenClass;
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Admin\CMSBatchActionHandler;
+use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Cache;
 use SilverStripe\Core\Convert;
@@ -24,19 +26,9 @@ use SilverStripe\Dev\FunctionalTest;
 use Zend_Cache;
 use Page;
 
-
-
-
-
-/**
- * @package cms
- * @subpackage tests
- */
 class CMSMainTest extends FunctionalTest {
 
 	protected static $fixture_file = 'CMSMainTest.yml';
-
-	static protected $orig = array();
 
 	public function setUp() {
 		parent::setUp();
@@ -50,14 +42,14 @@ class CMSMainTest extends FunctionalTest {
 		}
 	}
 
-	function testSiteTreeHints() {
+	public function testSiteTreeHints() {
 		$cache = Cache::factory('CMSMain_SiteTreeHints');
 		// Login as user with root creation privileges
-		$user = $this->objFromFixture('SilverStripe\\Security\\Member', 'rootedituser');
+		$user = $this->objFromFixture(Member::class, 'rootedituser');
 		$user->logIn();
 		$cache->clean(Zend_Cache::CLEANING_MODE_ALL);
 
-		$rawHints = singleton('SilverStripe\\CMS\\Controllers\\CMSMain')->SiteTreeHints();
+		$rawHints = singleton(CMSMain::class)->SiteTreeHints();
 		$this->assertNotNull($rawHints);
 
 		$rawHints = preg_replace('/^"(.*)"$/', '$1', Convert::xml2raw($rawHints));
@@ -68,27 +60,27 @@ class CMSMainTest extends FunctionalTest {
 		$this->assertArrayHasKey('All', $hints);
 
 		$this->assertArrayHasKey(
-				'CMSMainTest_ClassA',
-				$hints['All'],
-				'Global list shows allowed classes'
+			CMSMainTest\ClassA::class,
+			$hints['All'],
+			'Global list shows allowed classes'
 		);
 
 		$this->assertArrayNotHasKey(
-				'CMSMainTest_HiddenClass',
-				$hints['All'],
-				'Global list does not list hidden classes'
+			CMSMainTest\TestHiddenClass::class,
+			$hints['All'],
+			'Global list does not list hidden classes'
 		);
 
 		$this->assertNotContains(
-				'CMSMainTest_ClassA',
-				$hints['Root']['disallowedChildren'],
-				'Limits root classes'
+			CMSMainTest\ClassA::class,
+			$hints['Root']['disallowedChildren'],
+			'Limits root classes'
 		);
 
 		$this->assertContains(
-				'CMSMainTest_NotRoot',
-				$hints['Root']['disallowedChildren'],
-				'Limits root classes'
+			CMSMainTest\NotRoot::class,
+			$hints['Root']['disallowedChildren'],
+			'Limits root classes'
 		);
 
 	}
@@ -97,9 +89,9 @@ class CMSMainTest extends FunctionalTest {
 		$this->logInWithPermission('ADMIN');
 
 		// Check page A
-		$pageA = new CMSMainTest_ClassA();
+		$pageA = new CMSMainTest\ClassA();
 		$pageA->write();
-		$pageB = new CMSMainTest_ClassB();
+		$pageB = new CMSMainTest\ClassB();
 		$pageB->write();
 
 		// Check query
@@ -109,16 +101,16 @@ class CMSMainTest extends FunctionalTest {
 
 		// Page A can't have unrelated children
 		$this->assertContains(
-				'Page',
-				$children,
-				'Limited parent lists disallowed classes'
+			'Page',
+			$children,
+			'Limited parent lists disallowed classes'
 		);
 
 		// But it can create a ClassB
 		$this->assertNotContains(
-				'CMSMainTest_ClassB',
-				$children,
-				'Limited parent omits explicitly allowed classes in disallowedChildren'
+			CMSMainTest\ClassB::class,
+			$children,
+			'Limited parent omits explicitly allowed classes in disallowedChildren'
 		);
 	}
 
@@ -128,12 +120,12 @@ class CMSMainTest extends FunctionalTest {
 	public function testPublish() {
 		$page1 = $this->objFromFixture(Page::class, "page1");
 		$page2 = $this->objFromFixture(Page::class, "page2");
-		$this->session()->inst_set('loggedInAs', $this->idFromFixture('SilverStripe\\Security\\Member', 'admin'));
+		$this->session()->inst_set('loggedInAs', $this->idFromFixture(Member::class, 'admin'));
 
 		$response = $this->get('admin/pages/publishall?confirm=1');
 		$this->assertContains(
-				'Done: Published 30 pages',
-				$response->getBody()
+			'Done: Published 30 pages',
+			$response->getBody()
 		);
 
 		// Some modules (e.g., cmsworkflow) will remove this action
@@ -196,7 +188,7 @@ class CMSMainTest extends FunctionalTest {
 	 * Mostly, this is just checking that the method doesn't return an error
 	 */
 	public function testThatGetCMSFieldsWorksOnEveryPageType() {
-		$classes = ClassInfo::subclassesFor("SilverStripe\\CMS\\Model\\SiteTree");
+		$classes = ClassInfo::subclassesFor(SiteTree::class);
 		array_shift($classes);
 
 		foreach ($classes as $class) {
@@ -207,7 +199,7 @@ class CMSMainTest extends FunctionalTest {
 			$page->Title = "Test $class page";
 			$page->write();
 			$page->flushCache();
-			$page = DataObject::get_by_id("SilverStripe\\CMS\\Model\\SiteTree", $page->ID);
+			$page = DataObject::get_by_id(SiteTree::class, $page->ID);
 
 			$this->assertTrue($page->getCMSFields() instanceof FieldList);
 		}
@@ -216,7 +208,7 @@ class CMSMainTest extends FunctionalTest {
 	public function testCanPublishPageWithUnpublishedParentWithStrictHierarchyOff() {
 		$this->logInWithPermission('ADMIN');
 
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'enforce_strict_hierarchy', true);
+		Config::inst()->update(SiteTree::class, 'enforce_strict_hierarchy', true);
 		$parentPage = $this->objFromFixture(Page::class, 'page3');
 		$childPage = $this->objFromFixture(Page::class, 'page1');
 
@@ -225,18 +217,18 @@ class CMSMainTest extends FunctionalTest {
 
 		$actions = $childPage->getCMSActions()->dataFields();
 		$this->assertArrayHasKey(
-				'action_publish',
-				$actions,
-				'Can publish a page with an unpublished parent with strict hierarchy off'
+			'action_publish',
+			$actions,
+			'Can publish a page with an unpublished parent with strict hierarchy off'
 		);
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'enforce_strict_hierarchy', false);
+		Config::inst()->update(SiteTree::class, 'enforce_strict_hierarchy', false);
 	}
 
 	/**
 	 * Test that a draft-deleted page can still be opened in the CMS
 	 */
 	public function testDraftDeletedPageCanBeOpenedInCMS() {
-		$this->session()->inst_set('loggedInAs', $this->idFromFixture('SilverStripe\\Security\\Member', 'admin'));
+		$this->session()->inst_set('loggedInAs', $this->idFromFixture(Member::class, 'admin'));
 
 		// Set up a page that is delete from live
 		$page = $this->objFromFixture(Page::class, 'page1');
@@ -246,10 +238,10 @@ class CMSMainTest extends FunctionalTest {
 
 		$response = $this->get('admin/pages/edit/show/' . $pageID);
 
-		$livePage = Versioned::get_one_by_stage("SilverStripe\\CMS\\Model\\SiteTree", "Live", array(
+		$livePage = Versioned::get_one_by_stage(SiteTree::class, "Live", array(
 				'"SiteTree"."ID"' => $pageID
 		));
-		$this->assertInstanceOf('SilverStripe\\CMS\\Model\\SiteTree', $livePage);
+		$this->assertInstanceOf(SiteTree::class, $livePage);
 		$this->assertTrue($livePage->canDelete());
 
 		// Check that the 'restore' button exists as a simple way of checking that the correct page is returned.
@@ -296,8 +288,8 @@ class CMSMainTest extends FunctionalTest {
 		$origFollow = $this->autoFollowRedirection;
 		$this->autoFollowRedirection = false;
 
-		$cmsUser = $this->objFromFixture('SilverStripe\\Security\\Member', 'allcmssectionsuser');
-		$rootEditUser = $this->objFromFixture('SilverStripe\\Security\\Member', 'rootedituser');
+		$cmsUser = $this->objFromFixture(Member::class, 'allcmssectionsuser');
+		$rootEditUser = $this->objFromFixture(Member::class, 'rootedituser');
 
 		// with insufficient permissions
 		$cmsUser->logIn();
@@ -347,7 +339,7 @@ class CMSMainTest extends FunctionalTest {
 		$origFollow = $this->autoFollowRedirection;
 		$this->autoFollowRedirection = false;
 
-		$adminUser = $this->objFromFixture('SilverStripe\\Security\\Member', 'admin');
+		$adminUser = $this->objFromFixture(Member::class, 'admin');
 		$adminUser->logIn();
 
 		// Create toplevel page
@@ -356,7 +348,7 @@ class CMSMainTest extends FunctionalTest {
 			'admin/pages/add/AddForm',
 			array(
 				'ParentID' => '0',
-				'PageType' => 'CMSMainTest_ClassA',
+				'PageType' => CMSMainTest\ClassA::class,
 				'Locale' => 'en_US',
 				'action_doAdd' => 1,
 				'ajax' => 1
@@ -375,7 +367,7 @@ class CMSMainTest extends FunctionalTest {
 			'admin/pages/add/AddForm',
 			array(
 				'ParentID' => $newPageId,
-				'PageType' => 'CMSMainTest_ClassB',
+				'PageType' => CMSMainTest\ClassB::class,
 				'Locale' => 'en_US',
 				'action_doAdd' => 1,
 				'ajax' => 1
@@ -418,7 +410,7 @@ class CMSMainTest extends FunctionalTest {
 	public function testBreadcrumbs() {
 		$page3 = $this->objFromFixture(Page::class, 'page3');
 		$page31 = $this->objFromFixture(Page::class, 'page31');
-		$adminuser = $this->objFromFixture('SilverStripe\\Security\\Member', 'admin');
+		$adminuser = $this->objFromFixture(Member::class, 'admin');
 		$this->session()->inst_set('loggedInAs', $adminuser->ID);
 
 		$response = $this->get('admin/pages/edit/show/' . $page31->ID);
@@ -464,8 +456,8 @@ class CMSMainTest extends FunctionalTest {
 		$pages = $controller->getList()->sort('Title');
 		$this->assertEquals(28, $pages->count());
 		$this->assertEquals(
-				array('Home', 'Page 1', 'Page 10', 'Page 11', 'Page 12'),
-				$pages->Limit(5)->column('Title')
+			array('Home', 'Page 1', 'Page 10', 'Page 11', 'Page 12'),
+			$pages->Limit(5)->column('Title')
 		);
 
 		// Change state of tree
@@ -486,57 +478,57 @@ class CMSMainTest extends FunctionalTest {
 		$pages = $controller->getList()->sort('Title');
 		$this->assertEquals(26, $pages->count());
 		$this->assertEquals(
-				array('Home', 'Page 10', 'Page 11', 'Page 13', 'Page 14'),
-				$pages->Limit(5)->column('Title')
+			array('Home', 'Page 10', 'Page 11', 'Page 13', 'Page 14'),
+			$pages->Limit(5)->column('Title')
 		);
 
 		// Test deleted page filter
 		$params = array(
-				'FilterClass' => 'SilverStripe\\CMS\\Controllers\\CMSSiteTreeFilter_StatusDeletedPages'
+			'FilterClass' => CMSSiteTreeFilter_StatusDeletedPages::class
 		);
 		$pages = $controller->getList($params);
 		$this->assertEquals(1, $pages->count());
 		$this->assertEquals(
-				array('Page 1'),
-				$pages->column('Title')
+			array('Page 1'),
+			$pages->column('Title')
 		);
 
 		// Test live, but not on draft filter
 		$params = array(
-			'FilterClass' => 'SilverStripe\\CMS\\Controllers\\CMSSiteTreeFilter_StatusRemovedFromDraftPages'
+			'FilterClass' => CMSSiteTreeFilter_StatusRemovedFromDraftPages::class
 		);
 		$pages = $controller->getList($params);
 		$this->assertEquals(1, $pages->count());
 		$this->assertEquals(
-				array('Page 12'),
-				$pages->column('Title')
+			array('Page 12'),
+			$pages->column('Title')
 		);
 
 		// Test live pages filter
 		$params = array(
-			'FilterClass' => 'SilverStripe\\CMS\\Controllers\\CMSSiteTreeFilter_PublishedPages'
+			'FilterClass' => CMSSiteTreeFilter_PublishedPages::class
 		);
 		$pages = $controller->getList($params);
 		$this->assertEquals(2, $pages->count());
 		$this->assertEquals(
-				array('Page 11', 'Page 12'),
-				$pages->column('Title')
+			array('Page 11', 'Page 12'),
+			$pages->column('Title')
 		);
 
 		// Test that parentID is ignored when filtering
 		$pages = $controller->getList($params, $page3->ID);
 		$this->assertEquals(2, $pages->count());
 		$this->assertEquals(
-				array('Page 11', 'Page 12'),
-				$pages->column('Title')
+			array('Page 11', 'Page 12'),
+			$pages->column('Title')
 		);
 
 		// Test that parentID is respected when not filtering
 		$pages = $controller->getList(array(), $page3->ID);
 		$this->assertEquals(2, $pages->count());
 		$this->assertEquals(
-				array('Page 3.1', 'Page 3.2'),
-				$pages->column('Title')
+			array('Page 3.1', 'Page 3.2'),
+			$pages->column('Title')
 		);
 	}
 
@@ -545,13 +537,13 @@ class CMSMainTest extends FunctionalTest {
 	 */
 	public function testGetEditForm() {
 		// Login is required prior to accessing a CMS form.
-		$this->loginWithPermission('ADMIN');
+		$this->logInWithPermission('ADMIN');
 
 		// Get a associated with a fixture page.
 		$page = $this->objFromFixture(Page::class, 'page1');
 		$controller = new CMSMain();
 		$form = $controller->getEditForm($page->ID);
-		$this->assertInstanceOf("SilverStripe\\Forms\\Form", $form);
+		$this->assertInstanceOf(Form::class, $form);
 
 		// Ensure that the form will not "validate" on delete or "unpublish" actions.
 		$exemptActions = $form->getValidationExemptActions();
@@ -565,57 +557,23 @@ class CMSMainTest extends FunctionalTest {
 	public function testChangeClass() {
 		$this->logInWithPermission('ADMIN');
 		$cms = new CMSMain();
-		$page = new CMSMainTest_ClassA();
+		$page = new CMSMainTest\ClassA();
 		$page->Title = 'Class A';
 		$page->write();
 
 		$form = $cms->getEditForm($page->ID);
-		$form->loadDataFrom(['ClassName' => 'CMSMainTest_ClassB']);
+		$form->loadDataFrom(['ClassName' => CMSMainTest\ClassB::class]);
 		$result = $cms->save([
 			'ID' => $page->ID,
-			'ClassName' => 'CMSMainTest_ClassB'
+			'ClassName' => CMSMainTest\ClassB::class
 		], $form);
 		$this->assertEquals(200, $result->getStatusCode());
 
 		$newPage = SiteTree::get()->byID($page->ID);
 
-		$this->assertInstanceOf('CMSMainTest_ClassB', $newPage);
-		$this->assertEquals('CMSMainTest_ClassB', $newPage->ClassName);
+		$this->assertInstanceOf(CMSMainTest\ClassB::class, $newPage);
+		$this->assertEquals(CMSMainTest\ClassB::class, $newPage->ClassName);
 		$this->assertEquals('Class A', $newPage->Title);
 
 	}
-}
-
-class CMSMainTest_ClassA extends Page implements TestOnly {
-	private static $allowed_children = array('CMSMainTest_ClassB');
-
-	protected function onBeforeWrite()
-	{
-		parent::onBeforeWrite();
-
-		if ($this->ClassName !== self::class) {
-			throw new ValidationException("Class saved with incorrect ClassName");
-		}
-	}
-}
-
-class CMSMainTest_ClassB extends Page implements TestOnly {
-
-	protected function onBeforeWrite()
-	{
-		parent::onBeforeWrite();
-
-		if ($this->ClassName !== self::class) {
-			throw new ValidationException("Class saved with incorrect ClassName");
-		}
-	}
-
-}
-
-class CMSMainTest_NotRoot extends Page implements TestOnly {
-	private static $can_be_root = false;
-}
-
-class CMSMainTest_HiddenClass extends Page implements TestOnly, HiddenClass {
-
 }

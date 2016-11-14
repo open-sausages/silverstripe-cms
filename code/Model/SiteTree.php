@@ -1729,7 +1729,7 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 		if ($existingPage) return false;
 
 		return !($existingPage);
-		}
+	}
 
 	/**
 	 * Generate a URL segment based on the title provided.

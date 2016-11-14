@@ -53,7 +53,7 @@ before_script:
  - "if [ \"$BEHAT_TEST\" = \"1\" ]; then (vendor/bin/serve --bootstrap-file tests/behat/serve-bootstrap.php &> serve.log &); fi"
 
 script:
- - "if [ \"$PHPUNIT_TEST\" = \"1\" ]; then vendor/bin/phpunit tests flush=1; fi"
+ - "if [ \"$PHPUNIT_TEST\" = \"1\" ]; then vendor/bin/phpunit tests/php flush=1; fi"
  - "if [ \"$BEHAT_TEST\" = \"1\" ]; then vendor/bin/behat .; fi"
  - "if [ \"$NPM_TEST\" = \"1\" ]; then (nvm use 4 && npm run lint); fi"
 

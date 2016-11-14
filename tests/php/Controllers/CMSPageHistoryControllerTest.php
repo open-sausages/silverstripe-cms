@@ -2,19 +2,11 @@
 
 namespace SilverStripe\CMS\Tests\Controllers;
 
-
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Controllers\CMSPageHistoryController;
 use SilverStripe\Dev\FunctionalTest;
 use Page;
 
-
-
-
-/**
- * @package cms
- * @subpackage tests
- */
 class CMSPageHistoryControllerTest extends FunctionalTest {
 
 	protected static $fixture_file = 'CMSPageHistoryControllerTest.yml';
@@ -25,7 +17,7 @@ class CMSPageHistoryControllerTest extends FunctionalTest {
 	public function setUp() {
 		parent::setUp();
 
-		$this->loginWithPermission('ADMIN');
+		$this->logInWithPermission('ADMIN');
 
 		// creates a series of published, unpublished versions of a page
 		$this->page = new Page();

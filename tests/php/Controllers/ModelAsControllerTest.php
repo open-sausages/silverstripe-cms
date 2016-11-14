@@ -2,7 +2,6 @@
 
 namespace SilverStripe\CMS\Tests\Controllers;
 
-
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Controllers\OldPageRedirector;
@@ -13,13 +12,6 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Dev\FunctionalTest;
 use Page;
 
-
-
-
-/**
- * @package cms
- * @subpackage tests
- */
 class ModelAsControllerTest extends FunctionalTest {
 
 	protected $usesDatabase = true;
@@ -34,7 +26,7 @@ class ModelAsControllerTest extends FunctionalTest {
 	 */
 	public function setUp() {
 		parent::setUp();
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'nested_urls', true);
+		Config::inst()->update(SiteTree::class, 'nested_urls', true);
 	}
 
 
@@ -295,7 +287,7 @@ class ModelAsControllerTest extends FunctionalTest {
 	 */
 	public function testChildOfDraft() {
 		RootURLController::reset();
-		Config::inst()->update('SilverStripe\\CMS\\Model\\SiteTree', 'nested_urls', true);
+		Config::inst()->update(SiteTree::class, 'nested_urls', true);
 
 		$draft = new Page();
 		$draft->Title = 'Root Leve Draft Page';

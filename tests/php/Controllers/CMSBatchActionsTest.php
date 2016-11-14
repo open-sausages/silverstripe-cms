@@ -2,7 +2,6 @@
 
 namespace SilverStripe\CMS\Tests\Controllers;
 
-
 use SilverStripe\CMS\BatchActions\CMSBatchAction_Archive;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\BatchActions\CMSBatchAction_Publish;
@@ -10,8 +9,6 @@ use SilverStripe\CMS\BatchActions\CMSBatchAction_Unpublish;
 use SilverStripe\CMS\BatchActions\CMSBatchAction_Restore;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Dev\SapphireTest;
-
-
 
 /**
  * Tests CMS Specific subclasses of {@see CMSBatchAction}
@@ -26,19 +23,23 @@ class CMSBatchActionsTest extends SapphireTest {
 		$this->logInWithPermission('ADMIN');
 
 		// published page
+		/** @var SiteTree $published */
 		$published = $this->objFromFixture(SiteTree::class, 'published');
 		$published->publishSingle();
 
 		// Deleted / archived page
+		/** @var SiteTree $archived */
 		$archived = $this->objFromFixture(SiteTree::class, 'archived');
 		$archived->doArchive(); // should archive all children
 
 		// Unpublished
+		/** @var SiteTree $unpublished */
 		$unpublished = $this->objFromFixture(SiteTree::class, 'unpublished');
 		$unpublished->publishSingle();
 		$unpublished->doUnpublish();
 
 		// Modified
+		/** @var SiteTree $modified */
 		$modified = $this->objFromFixture(SiteTree::class, 'modified');
 		$modified->publishSingle();
 		$modified->Title = 'modified2';
