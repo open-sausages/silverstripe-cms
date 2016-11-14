@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DB;
@@ -13,6 +16,9 @@ use SilverStripe\CMS\Controllers\ModelAsController;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Dev\TestOnly;
+use Page;
+use Page_Controller;
+
 
 class VirtualPageTest extends FunctionalTest {
 	protected static $fixture_file = 'VirtualPageTest.yml';

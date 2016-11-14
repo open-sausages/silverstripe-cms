@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
@@ -7,6 +10,9 @@ use SilverStripe\CMS\Model\VirtualPage;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
+use AssetStoreTest_SpyStore;
+use Page;
+
 
 
 

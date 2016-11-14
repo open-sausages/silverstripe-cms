@@ -36,7 +36,8 @@
   },
   "autoload": {
     "psr-4": {
-      "SilverStripe\\CMS\\": "code/"
+      "SilverStripe\\CMS\\": "code/",
+      "SilverStripe\\CMS\\Tests\\": "tests/php/"
     },
     "classmap": ["tests/behat/"]
   },

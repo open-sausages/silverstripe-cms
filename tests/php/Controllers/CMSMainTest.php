@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Controllers;
+
+
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ValidationException;
@@ -18,6 +21,9 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\CSSContentParser;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Dev\FunctionalTest;
+use Zend_Cache;
+use Page;
+
 
 
 

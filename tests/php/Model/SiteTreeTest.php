@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DataObject;
@@ -21,6 +24,10 @@ use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\View\Parsers\HTMLCleaner;
 use SilverStripe\View\Parsers\Diff;
+use Page;
+use ReflectionMethod;
+use Page_Controller;
+
 
 
 

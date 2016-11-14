@@ -1,11 +1,16 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Filesystem;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Dev\CSSContentParser;
 use SilverStripe\Dev\FunctionalTest;
+use AssetStoreTest_SpyStore;
+
 
 class SiteTreeHTMLEditorFieldTest extends FunctionalTest {
 	protected static $fixture_file = 'SiteTreeHTMLEditorFieldTest.yml';

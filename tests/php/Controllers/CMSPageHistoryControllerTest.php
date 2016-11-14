@@ -1,8 +1,13 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Controllers;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Controllers\CMSPageHistoryController;
 use SilverStripe\Dev\FunctionalTest;
+use Page;
+
 
 
 

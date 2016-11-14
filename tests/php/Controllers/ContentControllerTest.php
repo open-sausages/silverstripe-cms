@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Controllers;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\CMS\Model\SiteTree;
@@ -8,6 +11,9 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Dev\FunctionalTest;
+use Page;
+use Page_Controller;
+
 
 /**
  * @package cms

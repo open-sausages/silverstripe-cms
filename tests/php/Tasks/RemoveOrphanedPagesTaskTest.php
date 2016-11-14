@@ -1,7 +1,12 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Tasks;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\Dev\FunctionalTest;
+
+
 
 
 /**

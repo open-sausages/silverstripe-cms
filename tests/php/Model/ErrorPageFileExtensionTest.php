@@ -1,10 +1,15 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\Assets\File;
 use SilverStripe\Control\Session;
 use SilverStripe\View\Parsers\ShortcodeParser;
 use SilverStripe\Dev\SapphireTest;
+use AssetStoreTest_SpyStore;
+
 
 
 class ErrorPageFileExtensionTest extends SapphireTest {

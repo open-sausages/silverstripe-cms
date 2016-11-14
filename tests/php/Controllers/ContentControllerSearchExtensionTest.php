@@ -1,11 +1,16 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Controllers;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\ORM\Search\FulltextSearchable;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
+use Page;
+
 
 
 

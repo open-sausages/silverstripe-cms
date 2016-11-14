@@ -1,11 +1,17 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\CMS\Model\VirtualPage;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Filesystem;
 use SilverStripe\Dev\SapphireTest;
+use AssetStoreTest_SpyStore;
+use Page;
+
 
 
 

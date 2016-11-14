@@ -1,9 +1,14 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\CMS\Model\ErrorPage;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\FunctionalTest;
+use AssetStoreTest_SpyStore;
+
 
 
 

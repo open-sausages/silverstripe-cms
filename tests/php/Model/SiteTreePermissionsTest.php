@@ -1,11 +1,16 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\Security\Member;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\FunctionalTest;
+
+
 
 
 

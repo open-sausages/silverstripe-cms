@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Model;
+
+
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\HTTP;
@@ -8,6 +11,8 @@ use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Dev\TestOnly;
+
+
 
 
 /**

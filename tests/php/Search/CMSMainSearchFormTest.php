@@ -1,6 +1,11 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Search;
+
+
 use SilverStripe\Dev\FunctionalTest;
+
+
 class CMSMainSearchFormTest extends FunctionalTest {
 
 	protected static $fixture_file = '../controller/CMSMainTest.yml';

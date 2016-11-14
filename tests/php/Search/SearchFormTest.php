@@ -1,5 +1,8 @@
 <?php
 
+namespace SilverStripe\CMS\Tests\Search;
+
+
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\Versioning\Versioned;
 use SilverStripe\MSSQL\MSSQLDatabase;
@@ -8,6 +11,8 @@ use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\CMS\Search\SearchForm;
 use SilverStripe\ORM\Search\FulltextSearchable;
 use SilverStripe\Dev\FunctionalTest;
+
+
 
 
 
