@@ -50,6 +50,7 @@ use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\HiddenClass;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\ValidationResult;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -119,6 +120,9 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
         'SearchForm',
         'SiteTreeAsUL',
         'getshowdeletedsubtree',
+        'savetreenode',
+        'getsubtree',
+        'updatetreenodes',
         'batchactions',
         'treeview',
         'listview',
@@ -387,13 +391,375 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
     public function SiteTreeAsUL()
     {
         // Pre-cache sitetree version numbers for querying efficiency
-        Versioned::prepopulate_versionnumber_cache(SiteTree::class, "Stage");
-        Versioned::prepopulate_versionnumber_cache(SiteTree::class, "Live");
+        Versioned::prepopulate_versionnumber_cache(SiteTree::class, Versioned::DRAFT);
+        Versioned::prepopulate_versionnumber_cache(SiteTree::class, Versioned::LIVE);
         $html = $this->getSiteTreeFor($this->stat('tree_class'));
 
         $this->extend('updateSiteTreeAsUL', $html);
 
         return $html;
+    }
+
+    /**
+     * Get a site tree HTML listing which displays the nodes under the given criteria.
+     *
+     * @param string $className The class of the root object
+     * @param string $rootID The ID of the root object.  If this is null then a complete tree will be
+     *  shown
+     * @param string $childrenMethod The method to call to get the children of the tree. For example,
+     *  Children, AllChildrenIncludingDeleted, or AllHistoricalChildren
+     * @param string $numChildrenMethod
+     * @param callable $filterFunction
+     * @param int $nodeCountThreshold
+     * @return string Nested unordered list with links to each page
+     */
+    public function getSiteTreeFor(
+        $className,
+        $rootID = null,
+        $childrenMethod = null,
+        $numChildrenMethod = null,
+        $filterFunction = null,
+        $nodeCountThreshold = 30
+    ) {
+
+        // Filter criteria
+        $filter = $this->getSearchFilter();
+
+        // Default childrenMethod and numChildrenMethod
+        if (!$childrenMethod) {
+            $childrenMethod = ($filter && $filter->getChildrenMethod())
+            ? $filter->getChildrenMethod()
+            : 'AllChildrenIncludingDeleted';
+        }
+
+        if (!$numChildrenMethod) {
+            $numChildrenMethod = 'numChildren';
+            if ($filter && $filter->getNumChildrenMethod()) {
+                $numChildrenMethod = $filter->getNumChildrenMethod();
+            }
+        }
+        if (!$filterFunction && $filter) {
+            $filterFunction = function ($node) use ($filter) {
+                return $filter->isPageIncluded($node);
+            };
+        }
+
+        // Get the tree root
+        $record = ($rootID) ? $this->getRecord($rootID) : null;
+        $obj = $record ? $record : singleton($className);
+
+        // Get the current page
+        // NOTE: This *must* be fetched before markPartialTree() is called, as this
+        // causes the Hierarchy::$marked cache to be flushed (@see CMSMain::getRecord)
+        // which means that deleted pages stored in the marked tree would be removed
+        $currentPage = $this->currentPage();
+
+        // Mark the nodes of the tree to return
+        if ($filterFunction) {
+            $obj->setMarkingFilterFunction($filterFunction);
+        }
+
+        $obj->markPartialTree($nodeCountThreshold, $this, $childrenMethod, $numChildrenMethod);
+
+        // Ensure current page is exposed
+        if ($currentPage) {
+            $obj->markToExpose($currentPage);
+        }
+
+        SiteTree::prepopulate_permission_cache(
+            'CanEditType',
+            $obj->markedNodeIDs(),
+            [ SiteTree::class, 'can_edit_multiple']
+        );
+
+        // getChildrenAsUL is a flexible and complex way of traversing the tree
+        $controller = $this;
+        $recordController = CMSPageEditController::singleton();
+        $titleFn = function (&$child, $numChildrenMethod) use (&$controller, &$recordController, $filter) {
+            $link = Controller::join_links($recordController->Link("show"), $child->ID);
+            $node = CMSMain_TreeNode::create($child, $link, $controller->isCurrentPage($child), $numChildrenMethod, $filter);
+            return $node->forTemplate();
+        };
+
+        // Limit the amount of nodes shown for performance reasons.
+        // Skip the check if we're filtering the tree, since its not clear how many children will
+        // match the filter criteria until they're queried (and matched up with previously marked nodes).
+        $nodeThresholdLeaf = SiteTree::config()->get('node_threshold_leaf');
+        if ($nodeThresholdLeaf && !$filterFunction) {
+            $nodeCountCallback = function ($parent, $numChildren) use (&$controller, $nodeThresholdLeaf) {
+                if ( !$parent->ID || $numChildren <= $nodeThresholdLeaf) {
+                    return null;
+                }
+                return sprintf(
+                    '<ul><li class="readonly"><span class="item">'
+                        . '%s (<a href="%s" class="cms-panel-link" data-pjax-target="Content">%s</a>)'
+                        . '</span></li></ul>',
+                    _t('LeftAndMain.TooManyPages', 'Too many pages'),
+                    Controller::join_links(
+                        $controller->LinkWithSearch($controller->Link()),
+                        '?view=listview&ParentID=' . $parent->ID
+                    ),
+                    _t(
+                        'LeftAndMain.ShowAsList',
+                        'show as list',
+                        'Show large amount of pages in list instead of tree view'
+                    )
+                );
+            };
+        } else {
+            $nodeCountCallback = null;
+        }
+
+        // If the amount of pages exceeds the node thresholds set, use the callback
+        $html = null;
+        if ($obj->ParentID && $nodeCountCallback) {
+            $html = $nodeCountCallback($obj, $obj->$numChildrenMethod());
+        }
+
+        // Otherwise return the actual tree (which might still filter leaf thresholds on children)
+        if (!$html) {
+            $html = $obj->getChildrenAsUL(
+                "",
+                $titleFn,
+                CMSPagesController::singleton(),
+                true,
+                $childrenMethod,
+                $numChildrenMethod,
+                $nodeCountThreshold,
+                $nodeCountCallback
+            );
+        }
+
+        // Wrap the root if needs be.
+        if (!$rootID) {
+            // This lets us override the tree title with an extension
+            if ($this->hasMethod('getCMSTreeTitle') && $customTreeTitle = $this->getCMSTreeTitle()) {
+                $treeTitle = $customTreeTitle;
+            } elseif (class_exists(SiteConfig::class)) {
+                $siteConfig = SiteConfig::current_site_config();
+                $treeTitle =  Convert::raw2xml($siteConfig->Title);
+            } else {
+                $treeTitle = '...';
+            }
+
+            $html = "<ul><li id=\"record-0\" data-id=\"0\" class=\"Root nodelete\"><strong>$treeTitle</strong>"
+                . $html . "</li></ul>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Get a subtree underneath the request param 'ID'.
+     * If ID = 0, then get the whole tree.
+     *
+     * @param HTTPRequest $request
+     * @return string
+     */
+    public function getsubtree($request)
+    {
+        $html = $this->getSiteTreeFor(
+            $this->stat('tree_class'),
+            $request->getVar('ID'),
+            null,
+            null,
+            null,
+            $request->getVar('minNodeCount')
+        );
+
+        // Trim off the outer tag
+        $html = preg_replace('/^[\s\t\r\n]*<ul[^>]*>/', '', $html);
+        $html = preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/', '', $html);
+
+        return $html;
+    }
+
+    /**
+     * Allows requesting a view update on specific tree nodes.
+     * Similar to {@link getsubtree()}, but doesn't enforce loading
+     * all children with the node. Useful to refresh views after
+     * state modifications, e.g. saving a form.
+     *
+     * @param HTTPRequest $request
+     * @return string JSON
+     */
+    public function updatetreenodes($request)
+    {
+        $data = array();
+        $ids = explode(',', $request->getVar('ids'));
+        foreach ($ids as $id) {
+            if ($id === "") {
+                continue; // $id may be a blank string, which is invalid and should be skipped over
+            }
+
+            $record = $this->getRecord($id);
+            if (!$record) {
+                continue; // In case a page is no longer available
+            }
+            $recordController = CMSPageEditController::singleton();
+
+            // Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
+            // TODO: These methods should really be in hierarchy - for a start it assumes Sort exists
+            $prev = null;
+
+            $className = $this->stat('tree_class');
+            $next = DataObject::get($className)
+                ->filter('ParentID', $record->ParentID)
+                ->filter('Sort:GreaterThan', $record->Sort)
+                ->first();
+
+            if (!$next) {
+                $prev = DataObject::get($className)
+                    ->filter('ParentID', $record->ParentID)
+                    ->filter('Sort:LessThan', $record->Sort)
+                    ->reverse()
+                    ->first();
+            }
+
+            $link = Controller::join_links($recordController->Link("show"), $record->ID);
+            $html = CMSMain_TreeNode::create($record, $link, $this->isCurrentPage($record))->forTemplate(). '</li>';
+
+            $data[$id] = array(
+                'html' => $html,
+                'ParentID' => $record->ParentID,
+                'NextID' => $next ? $next->ID : null,
+                'PrevID' => $prev ? $prev->ID : null
+            );
+        }
+        $this->getResponse()->addHeader('Content-Type', 'text/json');
+        return Convert::raw2json($data);
+    }
+
+    /**
+     * Update the position and parent of a tree node.
+     * Only saves the node if changes were made.
+     *
+     * Required data:
+     * - 'ID': The moved node
+     * - 'ParentID': New parent relation of the moved node (0 for root)
+     * - 'SiblingIDs': Array of all sibling nodes to the moved node (incl. the node itself).
+     *   In case of a 'ParentID' change, relates to the new siblings under the new parent.
+     *
+     * @param HTTPRequest $request
+     * @return HTTPResponse JSON string with a
+     * @throws HTTPResponse_Exception
+     */
+    public function savetreenode($request)
+    {
+        if (!SecurityToken::inst()->checkRequest($request)) {
+            return $this->httpError(400);
+        }
+        if (!Permission::check('SITETREE_REORGANISE') && !Permission::check('ADMIN')) {
+            $this->getResponse()->setStatusCode(
+                403,
+                _t(
+                    'LeftAndMain.CANT_REORGANISE',
+                    "You do not have permission to rearange the site tree. Your change was not saved."
+                )
+            );
+            return;
+        }
+
+        $className = $this->stat('tree_class');
+        $statusUpdates = array('modified'=>array());
+        $id = $request->requestVar('ID');
+        $parentID = $request->requestVar('ParentID');
+
+        if ($className == 'SilverStripe\\CMS\\Model\\SiteTree' && $page = DataObject::get_by_id(SiteTree::class, $id)) {
+            $root = $page->getParentType();
+            if (($parentID == '0' || $root == 'root') && !SiteConfig::current_site_config()->canCreateTopLevel()) {
+                $this->getResponse()->setStatusCode(
+                    403,
+                    _t(
+                        'LeftAndMain.CANT_REORGANISE',
+                        "You do not have permission to alter Top level pages. Your change was not saved."
+                    )
+                );
+                return;
+            }
+        }
+
+        $siblingIDs = $request->requestVar('SiblingIDs');
+        $statusUpdates = array('modified'=>array());
+        if (!is_numeric($id) || !is_numeric($parentID)) {
+            throw new InvalidArgumentException();
+        }
+
+        $node = DataObject::get_by_id($className, $id);
+        if ($node && !$node->canEdit()) {
+            return Security::permissionFailure($this);
+        }
+
+        if (!$node) {
+            $this->getResponse()->setStatusCode(
+                500,
+                _t(
+                    'LeftAndMain.PLEASESAVE',
+                    "Please Save Page: This page could not be updated because it hasn't been saved yet."
+                )
+            );
+            return;
+        }
+
+        // Update hierarchy (only if ParentID changed)
+        if ($node->ParentID != $parentID) {
+            $node->ParentID = (int)$parentID;
+            $node->write();
+
+            $statusUpdates['modified'][$node->ID] = array(
+                'TreeTitle'=>$node->TreeTitle
+            );
+
+            // Update all dependent pages
+            if (class_exists('SilverStripe\\CMS\\Model\\VirtualPage')) {
+                $virtualPages = VirtualPage::get()->filter("CopyContentFromID", $node->ID);
+                foreach ($virtualPages as $virtualPage) {
+                    $statusUpdates['modified'][$virtualPage->ID] = array(
+                        'TreeTitle' => $virtualPage->TreeTitle()
+                    );
+                }
+            }
+
+            $this->getResponse()->addHeader(
+                'X-Status',
+                rawurlencode(_t('LeftAndMain.REORGANISATIONSUCCESSFUL', 'Reorganised the site tree successfully.'))
+            );
+        }
+
+        // Update sorting
+        if (is_array($siblingIDs)) {
+            $counter = 0;
+            foreach ($siblingIDs as $id) {
+                if ($id == $node->ID) {
+                    $node->Sort = ++$counter;
+                    $node->write();
+                    $statusUpdates['modified'][$node->ID] = array(
+                        'TreeTitle' => $node->TreeTitle
+                    );
+                } elseif (is_numeric($id)) {
+                    // Nodes that weren't "actually moved" shouldn't be registered as
+                    // having been edited; do a direct SQL update instead
+                    ++$counter;
+                    $table = DataObject::getSchema()->baseDataTable($className);
+                    DB::prepared_query(
+                        "UPDATE \"$table\" SET \"Sort\" = ? WHERE \"ID\" = ?",
+                        array($counter, $id)
+                    );
+                }
+            }
+
+            $this->getResponse()->addHeader(
+                'X-Status',
+                rawurlencode(_t('LeftAndMain.REORGANISATIONSUCCESSFUL', 'Reorganised the site tree successfully.'))
+            );
+        }
+
+        return Convert::raw2json($statusUpdates);
+    }
+
+    public function CanOrganiseSitetree()
+    {
+        return !Permission::check('SITETREE_REORGANISE') && !Permission::check('ADMIN') ? false : true;
     }
 
     /**
