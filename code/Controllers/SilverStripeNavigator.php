@@ -4,7 +4,7 @@ namespace SilverStripe\CMS\Controllers;
 
 use SilverStripe\ORM\CMSPreviewable;
 use SilverStripe\Core\ClassInfo;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ListInterface;
 use SilverStripe\View\ViewableData;
@@ -67,7 +67,7 @@ class SilverStripeNavigator extends ViewableData
         ksort($items);
 
         // Drop the keys and let the ArrayList handle the numbering, so $First, $Last and others work properly.
-        return new ArrayListInterface(array_values($items));
+        return new ArrayList(array_values($items));
     }
 
     /**

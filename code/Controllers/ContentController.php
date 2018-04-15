@@ -12,7 +12,7 @@ use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Manifest\ModuleManifest;
 use SilverStripe\Internationalisation\Internationalisation;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
@@ -268,7 +268,7 @@ class ContentController extends Controller
     /**
      * Returns a fixed navigation menu of the given level.
      * @param int $level Menu level to return.
-     * @return ArrayListInterface
+     * @return ArrayList
      */
     public function getMenu($level = 1)
     {
@@ -305,7 +305,7 @@ class ContentController extends Controller
             }
         }
 
-        return new ArrayListInterface($visible);
+        return new ArrayList($visible);
     }
 
     public function Menu($level)
@@ -519,7 +519,7 @@ HTML;
             'index.html'
         );
 
-        $unsuccessful = new ArrayListInterface();
+        $unsuccessful = new ArrayList();
         foreach ($installfiles as $installfile) {
             if (file_exists(BASE_PATH . '/' . $installfile)) {
                 @unlink(BASE_PATH . '/' . $installfile);

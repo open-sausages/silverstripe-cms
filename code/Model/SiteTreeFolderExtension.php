@@ -9,7 +9,7 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Dev\Deprecation;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -68,7 +68,7 @@ class SiteTreeFolderExtension extends DataExtension
 
             // Get all records with any file ID in the searched columns
             $recordsArray = DataList::create($className)->whereAny($where)->toArray();
-            $records = ArrayListInterface::create($recordsArray);
+            $records = ArrayList::create($recordsArray);
             foreach ($columns as $column) {
                 $usedFiles = array_unique(array_merge($usedFiles, $records->column($column)));
             }

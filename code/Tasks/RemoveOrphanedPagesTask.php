@@ -11,7 +11,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ListInterface;
 use SilverStripe\Versioned\Versioned;
@@ -355,7 +355,7 @@ in the other stage:<br />
         $where[] = array("\"{$table}\".\"ParentID\" != ?" => 0);
         $where[] = '"Parents"."ID" IS NULL';
 
-        $orphans = new ArrayListInterface();
+        $orphans = new ArrayList();
         foreach (array(Versioned::DRAFT, Versioned::LIVE) as $stage) {
             $table .= ($stage == Versioned::LIVE) ? '_Live' : '';
             $stageOrphans = Versioned::get_by_stage(

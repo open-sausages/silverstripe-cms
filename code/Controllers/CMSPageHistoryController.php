@@ -15,7 +15,7 @@ use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\HTMLReadonlyField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Security;
@@ -321,7 +321,7 @@ class CMSPageHistoryController extends CMSMain
             $vd = new ViewableData();
 
             $versionsHtml = $vd->customise(array(
-                'VersionItems' => new ArrayListInterface($versions)
+                'VersionItems' => new ArrayList($versions)
             ))->renderWith($this->getTemplatesWithSuffix('_versions'));
         }
 

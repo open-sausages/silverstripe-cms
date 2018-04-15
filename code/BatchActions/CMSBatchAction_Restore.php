@@ -4,7 +4,7 @@ namespace SilverStripe\CMS\BatchActions;
 
 use SilverStripe\Admin\CMSBatchAction;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\ListInterface;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Permission;
@@ -32,7 +32,7 @@ class CMSBatchAction_Restore extends CMSBatchAction
         usort($pageArray, function (SiteTree $a, SiteTree $b) {
             return $a->getPageLevel() - $b->getPageLevel();
         });
-        $pages = new ArrayListInterface($pageArray);
+        $pages = new ArrayList($pageArray);
 
         // Restore
         return $this->batchaction(

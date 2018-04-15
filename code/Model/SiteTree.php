@@ -44,7 +44,7 @@ use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\Forms\TreeMultiselectField;
 use SilverStripe\Internationalisation\Internationalisation;
 use SilverStripe\Internationalisation\EntityProvider;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\CMSPreviewable;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -871,7 +871,7 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
      * @param boolean|string $stopAtPageType ClassName of a page to stop the upwards traversal.
      * @param boolean $showHidden Include pages marked with the attribute ShowInMenus = 0
      *
-     * @return ArrayListInterface
+     * @return ArrayList
     */
     public function getBreadcrumbItems($maxDepth = 20, $stopAtPageType = false, $showHidden = false)
     {
@@ -890,7 +890,7 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
             $page = $page->Parent();
         }
 
-        return new ArrayListInterface(array_reverse($pages));
+        return new ArrayList(array_reverse($pages));
     }
 
 
@@ -1721,7 +1721,7 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
     public function BackLinkTracking()
     {
         // @todo - Implement PolymorphicManyManyList to replace this
-        $list = ArrayListInterface::create();
+        $list = ArrayList::create();
         foreach ($this->BackLinks() as $link) {
             // Ensure parent record exists
             $item = $link->Parent();
@@ -1736,7 +1736,7 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
      * Returns the pages that depend on this page. This includes virtual pages, pages that link to it, etc.
      *
      * @param bool $includeVirtuals Set to false to exlcude virtual pages.
-     * @return ArrayListInterface|SiteTree[]
+     * @return ArrayList|SiteTree[]
      */
     public function DependentPages($includeVirtuals = true)
     {
@@ -1746,11 +1746,11 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
         }
 
         // Content links
-        $items = new ArrayListInterface();
+        $items = new ArrayList();
 
         // We merge all into a regular SS_List, because DataList doesn't support merge
         if ($contentLinks = $this->BackLinkTracking()) {
-            $linkList = new ArrayListInterface();
+            $linkList = new ArrayList();
             foreach ($contentLinks as $item) {
                 $item->DependentLinkType = 'Content link';
                 $linkList->push($item);
@@ -1762,7 +1762,7 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
         if ($includeVirtuals) {
             $virtuals = $this->VirtualPages();
             if ($virtuals) {
-                $virtualList = new ArrayListInterface();
+                $virtualList = new ArrayList();
                 foreach ($virtuals as $item) {
                     $item->DependentLinkType = 'Virtual page';
                     $virtualList->push($item);
@@ -1777,7 +1777,7 @@ class SiteTree extends DataObject implements PermissionProvider, EntityProvider,
             '"RedirectorPage"."LinkToID"' => $this->ID
         ));
         if ($redirectors) {
-            $redirectorList = new ArrayListInterface();
+            $redirectorList = new ArrayList();
             foreach ($redirectors as $item) {
                 $item->DependentLinkType = 'Redirector page';
                 $redirectorList->push($item);

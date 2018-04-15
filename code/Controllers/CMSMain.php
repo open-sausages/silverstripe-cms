@@ -44,7 +44,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayListInterface;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\CMSPreviewable;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -978,11 +978,11 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 
     /**
      * @param bool $unlinked
-     * @return ArrayListInterface
+     * @return ArrayList
      */
     public function Breadcrumbs($unlinked = false)
     {
-        $items = new ArrayListInterface();
+        $items = new ArrayList();
 
         // Check if we are editing a page
         /** @var SiteTree $record */
@@ -1000,7 +1000,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 
         // Add all ancestors
         $ancestors = $record->getAncestors();
-        $ancestors = new ArrayListInterface(array_reverse($ancestors->toArray()));
+        $ancestors = new ArrayList(array_reverse($ancestors->toArray()));
         $ancestors->push($record);
         /** @var SiteTree $ancestor */
         foreach ($ancestors as $ancestor) {
@@ -1100,7 +1100,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
     {
         $classes = SiteTree::page_type_classes();
 
-        $result = new ArrayListInterface();
+        $result = new ArrayList();
 
         foreach ($classes as $class) {
             $instance = SiteTree::singleton($class);
@@ -1363,7 +1363,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
         if (count($inChangeSetIDs) > 0) {
             $inChangeSets = ChangeSet::get()->filter(['ID' => $inChangeSetIDs, 'State' => ChangeSet::STATE_OPEN]);
         } else {
-            $inChangeSets = new ArrayListInterface();
+            $inChangeSets = new ArrayList();
         }
 
         $numCampaigns = ChangeSet::singleton()->i18n_pluralise($inChangeSets->count());
