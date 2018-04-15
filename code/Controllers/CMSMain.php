@@ -20,7 +20,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
@@ -44,7 +44,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\ArrayListInterface;
 use SilverStripe\ORM\CMSPreviewable;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -52,7 +52,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\HiddenClass;
 use SilverStripe\ORM\Hierarchy\MarkedSet;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Security\InheritedPermissions;
 use SilverStripe\Security\Member;
@@ -725,7 +725,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      *
      * @param HTTPRequest $request
      * @return HTTPResponse JSON string with a
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function savetreenode($request)
     {
@@ -978,11 +978,11 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 
     /**
      * @param bool $unlinked
-     * @return ArrayList
+     * @return ArrayListInterface
      */
     public function Breadcrumbs($unlinked = false)
     {
-        $items = new ArrayList();
+        $items = new ArrayListInterface();
 
         // Check if we are editing a page
         /** @var SiteTree $record */
@@ -1000,7 +1000,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 
         // Add all ancestors
         $ancestors = $record->getAncestors();
-        $ancestors = new ArrayList(array_reverse($ancestors->toArray()));
+        $ancestors = new ArrayListInterface(array_reverse($ancestors->toArray()));
         $ancestors->push($record);
         /** @var SiteTree $ancestor */
         foreach ($ancestors as $ancestor) {
@@ -1094,13 +1094,13 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      * Populates an array of classes in the CMS
      * which allows the user to change the page type.
      *
-     * @return SS_List
+     * @return ListInterface
      */
     public function PageTypes()
     {
         $classes = SiteTree::page_type_classes();
 
-        $result = new ArrayList();
+        $result = new ArrayListInterface();
 
         foreach ($classes as $class) {
             $instance = SiteTree::singleton($class);
@@ -1363,7 +1363,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
         if (count($inChangeSetIDs) > 0) {
             $inChangeSets = ChangeSet::get()->filter(['ID' => $inChangeSetIDs, 'State' => ChangeSet::STATE_OPEN]);
         } else {
-            $inChangeSets = new ArrayList();
+            $inChangeSets = new ArrayListInterface();
         }
 
         $numCampaigns = ChangeSet::singleton()->i18n_pluralise($inChangeSets->count());
@@ -1485,7 +1485,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      *
      * @param array $params Search filter criteria
      * @param int $parentID Optional parent node to filter on (can't be combined with other search criteria)
-     * @return SS_List
+     * @return ListInterface
      * @throws InvalidArgumentException if invalid filter class is passed.
      */
     public function getList($params = array(), $parentID = 0)
@@ -1623,7 +1623,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      * @param array $data
      * @param Form $form
      * @return HTTPResponse
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function save($data, $form)
     {
@@ -1639,7 +1639,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
                 return Security::permissionFailure($this);
             }
             if (!$record || !$record->ID) {
-                throw new HTTPResponse_Exception("Bad record ID #$id", 404);
+                throw new HTTPResponseException("Bad record ID #$id", 404);
             }
         } else {
             if (!$className::singleton()->canCreate()) {
@@ -1699,7 +1699,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      * @param int|string $id
      * @param bool $setID
      * @return mixed|DataObject
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function getNewItem($id, $setID = true)
     {
@@ -1711,7 +1711,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
             if (!$response) {
                 $response = $this->getResponse();
             }
-            throw new HTTPResponse_Exception($response);
+            throw new HTTPResponseException($response);
         }
 
         /** @var SiteTree $newItem */
@@ -1770,18 +1770,18 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      * @param array $data
      * @param Form $form
      * @return HTTPResponse
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function revert($data, $form)
     {
         if (!isset($data['ID'])) {
-            throw new HTTPResponse_Exception("Please pass an ID in the form content", 400);
+            throw new HTTPResponseException("Please pass an ID in the form content", 400);
         }
 
         $id = (int) $data['ID'];
         $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
         if (!$restoredPage) {
-            throw new HTTPResponse_Exception("SiteTree #$id not found", 400);
+            throw new HTTPResponseException("SiteTree #$id not found", 400);
         }
 
         /** @var SiteTree $record */
@@ -1795,7 +1795,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
             return Security::permissionFailure($this);
         }
         if (!$record || !$record->ID) {
-            throw new HTTPResponse_Exception("Bad record ID #$id", 404);
+            throw new HTTPResponseException("Bad record ID #$id", 404);
         }
 
         $record->doRevertToLive();
@@ -1821,7 +1821,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      * @param array $data
      * @param Form $form
      * @return HTTPResponse
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function delete($data, $form)
     {
@@ -1831,7 +1831,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
             return Security::permissionFailure();
         }
         if (!$record || !$record->ID) {
-            throw new HTTPResponse_Exception("Bad record ID #$id", 404);
+            throw new HTTPResponseException("Bad record ID #$id", 404);
         }
 
         // Delete record
@@ -1856,7 +1856,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
      * @param array $data
      * @param Form $form
      * @return HTTPResponse
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function archive($data, $form)
     {
@@ -1864,7 +1864,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
         /** @var SiteTree $record */
         $record = SiteTree::get()->byID($id);
         if (!$record || !$record->exists()) {
-            throw new HTTPResponse_Exception("Bad record ID #$id", 404);
+            throw new HTTPResponseException("Bad record ID #$id", 404);
         }
         if (!$record->canArchive()) {
             return Security::permissionFailure();
@@ -1903,7 +1903,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
             return Security::permissionFailure($this);
         }
         if (!$record || !$record->ID) {
-            throw new HTTPResponse_Exception("Bad record ID #" . (int)$data['ID'], 404);
+            throw new HTTPResponseException("Bad record ID #" . (int)$data['ID'], 404);
         }
 
         $record->doUnpublish();
@@ -2130,7 +2130,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
                 return Security::permissionFailure($this);
             }
             if (!$page || !$page->ID) {
-                throw new HTTPResponse_Exception("Bad record ID #$id", 404);
+                throw new HTTPResponseException("Bad record ID #$id", 404);
             }
 
             $newPage = $page->duplicate();
@@ -2174,7 +2174,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
                 return Security::permissionFailure($this);
             }
             if (!$page || !$page->ID) {
-                throw new HTTPResponse_Exception("Bad record ID #$id", 404);
+                throw new HTTPResponseException("Bad record ID #$id", 404);
             }
 
             $newPage = $page->duplicateWithChildren();

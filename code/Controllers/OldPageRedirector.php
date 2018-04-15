@@ -7,7 +7,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Core\Extension;
 
 class OldPageRedirector extends Extension
@@ -18,7 +18,7 @@ class OldPageRedirector extends Extension
      * find an old URL that it should be redirecting to.
      *
      * @param HTTPRequest $request The request object
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function onBeforeHTTPError404($request)
     {
@@ -44,7 +44,7 @@ class OldPageRedirector extends Extension
                 ),
                 301
             );
-            throw new HTTPResponse_Exception($res);
+            throw new HTTPResponseException($res);
         }
     }
 

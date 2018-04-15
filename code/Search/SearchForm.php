@@ -12,7 +12,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use Translatable;
 
 /**
@@ -123,7 +123,7 @@ class SearchForm extends Form
      * Return dataObjectSet of the results using current request to get info from form.
      * Wraps around {@link searchEngine()}.
      *
-     * @return SS_List
+     * @return ListInterface
      */
     public function getResults()
     {

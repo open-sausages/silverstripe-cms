@@ -2,7 +2,7 @@
 
 namespace SilverStripe\CMS\BatchActions;
 
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\Admin\CMSBatchAction;
 
 /**
@@ -15,7 +15,7 @@ class CMSBatchAction_Archive extends CMSBatchAction
         return _t(__CLASS__ . '.TITLE', 'Unpublish and archive');
     }
 
-    public function run(SS_List $pages)
+    public function run(ListInterface $pages)
     {
         return $this->batchaction(
             $pages,

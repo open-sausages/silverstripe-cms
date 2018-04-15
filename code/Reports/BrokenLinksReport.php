@@ -12,7 +12,7 @@ use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\ArrayListInterface;
 use SilverStripe\Reports\Report;
 
 /**
@@ -54,7 +54,7 @@ class BrokenLinksReport extends Report
             $ret = DataObject::get(SiteTree::class, $brokenFilter, $sort, $join, $limit);
         }
 
-        $returnSet = new ArrayList();
+        $returnSet = new ArrayListInterface();
         if ($ret) {
             foreach ($ret as $record) {
                 $reason = false;

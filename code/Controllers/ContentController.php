@@ -7,26 +7,26 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Manifest\ModuleManifest;
-use SilverStripe\i18n\i18n;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Internationalisation\Internationalisation;
+use SilverStripe\ORM\ArrayListInterface;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\FieldType\DBVarchar;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\Security\MemberAuthenticator\MemberAuthenticator;
 use SilverStripe\Security\Permission;
-use SilverStripe\Security\Security;
+use SilverStripe\Security\Encryptors\Security;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
-use SilverStripe\View\SSViewer;
+use SilverStripe\View\Templates\Viewer;
 use Translatable;
 
 /**
@@ -105,7 +105,7 @@ class ContentController extends Controller
      * Return the children of a given page. The parent reference can either be a page link or an ID.
      *
      * @param string|int $parentRef
-     * @return SS_List
+     * @return ListInterface
      */
     public function ChildrenOf($parentRef)
     {
@@ -175,7 +175,7 @@ class ContentController extends Controller
      *
      * @param HTTPRequest $request
      * @return HTTPResponse
-     * @throws HTTPResponse_Exception
+     * @throws HTTPResponseException
      */
     public function handleRequest(HTTPRequest $request)
     {
@@ -214,7 +214,7 @@ class ContentController extends Controller
             if (class_exists('Translatable')) {
                 $locale = $request->getVar('locale');
                 if ($locale
-                    && i18n::getData()->validate($locale)
+                    && Internationalisation::getData()->validate($locale)
                     && $this->dataRecord
                     && $this->dataRecord->Locale != $locale
                 ) {
@@ -222,7 +222,7 @@ class ContentController extends Controller
                     if ($translation) {
                         $response = new HTTPResponse();
                         $response->redirect($translation->Link(), 301);
-                        throw new HTTPResponse_Exception($response);
+                        throw new HTTPResponseException($response);
                     }
                 }
             }
@@ -233,7 +233,7 @@ class ContentController extends Controller
                 $response = parent::handleRequest($request);
 
                 Director::set_current_page(null);
-            } catch (HTTPResponse_Exception $e) {
+            } catch (HTTPResponseException $e) {
                 $this->popCurrent();
 
                 Director::set_current_page(null);
@@ -268,7 +268,7 @@ class ContentController extends Controller
     /**
      * Returns a fixed navigation menu of the given level.
      * @param int $level Menu level to return.
-     * @return ArrayList
+     * @return ArrayListInterface
      */
     public function getMenu($level = 1)
     {
@@ -305,7 +305,7 @@ class ContentController extends Controller
             }
         }
 
-        return new ArrayList($visible);
+        return new ArrayListInterface($visible);
     }
 
     public function Menu($level)
@@ -415,10 +415,10 @@ HTML;
         } elseif (class_exists('Translatable') && SiteTree::has_extension('Translatable')) {
             $locale = Translatable::get_current_locale();
         } else {
-            $locale = i18n::get_locale();
+            $locale = Internationalisation::get_locale();
         }
 
-        return i18n::convert_rfc1766($locale);
+        return Internationalisation::convert_rfc1766($locale);
     }
 
 
@@ -427,7 +427,7 @@ HTML;
      *
      * @param $action string
      *
-     * @return SSViewer
+     * @return \SilverStripe\View\Templates\Viewer
      */
     public function getViewer($action)
     {
@@ -453,7 +453,7 @@ HTML;
         }
 
         // Find templates for the controller + action together - e.g. PageController_action.ss
-        $templatesFound[] = SSViewer::get_templates_by_class(static::class, $action, Controller::class);
+        $templatesFound[] = Viewer::get_templates_by_class(static::class, $action, Controller::class);
 
         // Find templates for the record without an action - e.g. Page.ss
         if ($this->dataRecord instanceof SiteTree) {
@@ -461,10 +461,10 @@ HTML;
         }
 
         // Find the templates for the controller without an action - e.g. PageController.ss
-        $templatesFound[] = SSViewer::get_templates_by_class(static::class, "", Controller::class);
+        $templatesFound[] = Viewer::get_templates_by_class(static::class, "", Controller::class);
 
         $templates = array_merge(...$templatesFound);
-        return SSViewer::create($templates);
+        return Viewer::create($templates);
     }
 
 
@@ -519,7 +519,7 @@ HTML;
             'index.html'
         );
 
-        $unsuccessful = new ArrayList();
+        $unsuccessful = new ArrayListInterface();
         foreach ($installfiles as $installfile) {
             if (file_exists(BASE_PATH . '/' . $installfile)) {
                 @unlink(BASE_PATH . '/' . $installfile);

@@ -42,9 +42,9 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\ToggleCompositeField;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\Forms\TreeMultiselectField;
-use SilverStripe\i18n\i18n;
-use SilverStripe\i18n\i18nEntityProvider;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Internationalisation\Internationalisation;
+use SilverStripe\Internationalisation\EntityProvider;
+use SilverStripe\ORM\ArrayListInterface;
 use SilverStripe\ORM\CMSPreviewable;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -69,7 +69,7 @@ use SilverStripe\View\ArrayData;
 use SilverStripe\View\HTML;
 use SilverStripe\View\Parsers\ShortcodeParser;
 use SilverStripe\View\Parsers\URLSegmentFilter;
-use SilverStripe\View\SSViewer;
+use SilverStripe\View\Templates\Viewer;
 use Subsite;
 
 /**
@@ -109,7 +109,7 @@ use Subsite;
  * @mixin FileLinkTracking Added via filetracking.yml in silverstripe/assets
  * @mixin InheritedPermissionsExtension
  */
-class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvider, CMSPreviewable, Resettable, Flushable, MemberCacheFlusher
+class SiteTree extends DataObject implements PermissionProvider, EntityProvider, CMSPreviewable, Resettable, Flushable, MemberCacheFlusher
 {
 
     /**
@@ -855,7 +855,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
     public function Breadcrumbs($maxDepth = 20, $unlinked = false, $stopAtPageType = false, $showHidden = false, $delimiter = '&raquo;')
     {
         $pages = $this->getBreadcrumbItems($maxDepth, $stopAtPageType, $showHidden);
-        $template = SSViewer::create('BreadcrumbsTemplate');
+        $template = Viewer::create('BreadcrumbsTemplate');
         return $template->process($this->customise(new ArrayData(array(
             "Pages" => $pages,
             "Unlinked" => $unlinked,
@@ -871,7 +871,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
      * @param boolean|string $stopAtPageType ClassName of a page to stop the upwards traversal.
      * @param boolean $showHidden Include pages marked with the attribute ShowInMenus = 0
      *
-     * @return ArrayList
+     * @return ArrayListInterface
     */
     public function getBreadcrumbItems($maxDepth = 20, $stopAtPageType = false, $showHidden = false)
     {
@@ -890,7 +890,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
             $page = $page->Parent();
         }
 
-        return new ArrayList(array_reverse($pages));
+        return new ArrayListInterface(array_reverse($pages));
     }
 
 
@@ -1721,7 +1721,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
     public function BackLinkTracking()
     {
         // @todo - Implement PolymorphicManyManyList to replace this
-        $list = ArrayList::create();
+        $list = ArrayListInterface::create();
         foreach ($this->BackLinks() as $link) {
             // Ensure parent record exists
             $item = $link->Parent();
@@ -1736,7 +1736,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
      * Returns the pages that depend on this page. This includes virtual pages, pages that link to it, etc.
      *
      * @param bool $includeVirtuals Set to false to exlcude virtual pages.
-     * @return ArrayList|SiteTree[]
+     * @return ArrayListInterface|SiteTree[]
      */
     public function DependentPages($includeVirtuals = true)
     {
@@ -1746,11 +1746,11 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
         }
 
         // Content links
-        $items = new ArrayList();
+        $items = new ArrayListInterface();
 
         // We merge all into a regular SS_List, because DataList doesn't support merge
         if ($contentLinks = $this->BackLinkTracking()) {
-            $linkList = new ArrayList();
+            $linkList = new ArrayListInterface();
             foreach ($contentLinks as $item) {
                 $item->DependentLinkType = 'Content link';
                 $linkList->push($item);
@@ -1762,7 +1762,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
         if ($includeVirtuals) {
             $virtuals = $this->VirtualPages();
             if ($virtuals) {
-                $virtualList = new ArrayList();
+                $virtualList = new ArrayListInterface();
                 foreach ($virtuals as $item) {
                     $item->DependentLinkType = 'Virtual page';
                     $virtualList->push($item);
@@ -1777,7 +1777,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
             '"RedirectorPage"."LinkToID"' => $this->ID
         ));
         if ($redirectors) {
-            $redirectorList = new ArrayList();
+            $redirectorList = new ArrayListInterface();
             foreach ($redirectors as $item) {
                 $item->DependentLinkType = 'Redirector page';
                 $redirectorList->push($item);
@@ -2239,7 +2239,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
 
         // Render page information into the "more-options" drop-up, on the top.
         $liveRecord = Versioned::get_by_stage(self::class, Versioned::LIVE)->byID($this->ID);
-        $infoTemplate = SSViewer::get_templates_by_class(static::class, '_Information', self::class);
+        $infoTemplate = Viewer::get_templates_by_class(static::class, '_Information', self::class);
         $moreOptions->push(
             new LiteralField(
                 'Information',
@@ -2511,7 +2511,7 @@ class SiteTree extends DataObject implements PermissionProvider, i18nEntityProvi
             // If we're in translation mode, the link between the translated pagetype title and the actual classname
             // might not be obvious, so we add it in parantheses. Example: class "RedirectorPage" has the title
             // "Weiterleitung" in German, so it shows up as "Weiterleitung (RedirectorPage)"
-            if (i18n::getData()->langFromLocale(i18n::get_locale()) != 'en') {
+            if (Internationalisation::getData()->langFromLocale(Internationalisation::get_locale()) != 'en') {
                 $result[$class] = $result[$class] .  " ({$class})";
             }
         }

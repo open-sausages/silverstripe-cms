@@ -4,7 +4,7 @@ namespace SilverStripe\CMS\Model;
 
 use SilverStripe\Assets\File;
 use SilverStripe\ORM\DataExtension;
-use SilverStripe\View\SSViewer;
+use SilverStripe\View\Templates\Viewer;
 
 /**
  * @deprecated 4.2..5.0 Link tracking is baked into File class now
@@ -23,7 +23,7 @@ class SiteTreeFileExtension extends DataExtension
      */
     public function BackLinkHTMLList()
     {
-        $viewer = SSViewer::create(["type" => "Includes", self::class . "_description"]);
+        $viewer = Viewer::create(["type" => "Includes", self::class . "_description"]);
         return $viewer->process($this->owner);
     }
 }

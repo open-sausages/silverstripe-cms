@@ -3,7 +3,7 @@
 namespace SilverStripe\CMS\Controllers;
 
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -37,7 +37,7 @@ class CMSSiteTreeFilter_PublishedPages extends CMSSiteTreeFilter
      * Filters out all pages who's status who's status that doesn't exist on live
      *
      * @see {@link SiteTree::getStatusFlags()}
-     * @return SS_List
+     * @return ListInterface
      */
     public function getFilteredPages()
     {

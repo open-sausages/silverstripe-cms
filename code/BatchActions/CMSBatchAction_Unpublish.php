@@ -3,7 +3,7 @@
 namespace SilverStripe\CMS\BatchActions;
 
 use SilverStripe\Admin\CMSBatchAction;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 
 /**
  * Unpublish items batch action.
@@ -15,7 +15,7 @@ class CMSBatchAction_Unpublish extends CMSBatchAction
         return _t(__CLASS__ . '.UNPUBLISH_PAGES', 'Unpublish');
     }
 
-    public function run(SS_List $pages)
+    public function run(ListInterface $pages)
     {
         return $this->batchaction(
             $pages,

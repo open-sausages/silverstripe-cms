@@ -13,7 +13,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\SelectionGroup;
-use SilverStripe\Forms\SelectionGroup_Item;
+use SilverStripe\Forms\SelectionGroupItem;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
@@ -66,12 +66,12 @@ class CMSPageAddController extends CMSPageEditController
             $parentModeField = new SelectionGroup(
                 "ParentModeField",
                 array(
-                    new SelectionGroup_Item(
+                    new SelectionGroupItem(
                         "top",
                         null,
                         $topTitle
                     ),
-                    new SelectionGroup_Item(
+                    new SelectionGroupItem(
                         'child',
                         $parentField = new TreeDropdownField(
                             "ParentID",

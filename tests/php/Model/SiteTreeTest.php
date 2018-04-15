@@ -12,7 +12,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\i18n\i18n;
+use SilverStripe\Internationalisation\Internationalisation;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ValidationException;
@@ -921,8 +921,8 @@ class SiteTreeTest extends SapphireTest
 
     public function testURLSegmentAutoUpdateLocalized()
     {
-        $oldLocale = i18n::get_locale();
-        i18n::set_locale('de_DE');
+        $oldLocale = Internationalisation::get_locale();
+        Internationalisation::set_locale('de_DE');
 
         $sitetree = new SiteTree();
         $sitetree->Title = _t(
@@ -953,7 +953,7 @@ class SiteTreeTest extends SapphireTest
             'Does not auto-update once title has been changed'
         );
 
-        i18n::set_locale($oldLocale);
+        Internationalisation::set_locale($oldLocale);
     }
 
     /**

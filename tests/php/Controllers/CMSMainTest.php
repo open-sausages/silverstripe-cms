@@ -9,7 +9,7 @@ use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
@@ -427,7 +427,7 @@ class CMSMainTest extends FunctionalTest
             $id = 'new-Member-0';
             $member = $controller->getNewItem($id, false);
             $this->fail('Should not be able to create a Member object');
-        } catch (HTTPResponse_Exception $e) {
+        } catch (HTTPResponseException $e) {
             $this->assertEquals($controller->getResponse()->getStatusCode(), 302);
         }
     }

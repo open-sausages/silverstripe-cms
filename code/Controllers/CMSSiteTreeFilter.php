@@ -8,7 +8,7 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\DateField;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -130,7 +130,7 @@ abstract class CMSSiteTreeFilter implements LeftAndMain_SearchFilter
      * Gets the list of filtered pages
      *
      * @see {@link SiteTree::getStatusFlags()}
-     * @return SS_List
+     * @return ListInterface
      */
     abstract public function getFilteredPages();
 
@@ -241,7 +241,7 @@ abstract class CMSSiteTreeFilter implements LeftAndMain_SearchFilter
     /**
      * Maps a list of pages to an array of associative arrays with ID and ParentID keys
      *
-     * @param SS_List $pages
+     * @param ListInterface $pages
      * @return array
      */
     protected function mapIDs($pages)

@@ -11,9 +11,9 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\ArrayListInterface;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
@@ -339,7 +339,7 @@ in the other stage:<br />
      * @param string $sort
      * @param string $join
      * @param int|array $limit
-     * @return SS_List
+     * @return ListInterface
      */
     public function getOrphanedPages($class = SiteTree::class, $filter = array(), $sort = null, $join = null, $limit = null)
     {
@@ -355,7 +355,7 @@ in the other stage:<br />
         $where[] = array("\"{$table}\".\"ParentID\" != ?" => 0);
         $where[] = '"Parents"."ID" IS NULL';
 
-        $orphans = new ArrayList();
+        $orphans = new ArrayListInterface();
         foreach (array(Versioned::DRAFT, Versioned::LIVE) as $stage) {
             $table .= ($stage == Versioned::LIVE) ? '_Live' : '';
             $stageOrphans = Versioned::get_by_stage(

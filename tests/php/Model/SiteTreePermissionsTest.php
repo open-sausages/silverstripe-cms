@@ -4,7 +4,7 @@ namespace SilverStripe\CMS\Tests\Model;
 
 use Page;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
@@ -58,7 +58,7 @@ class SiteTreePermissionsTest extends FunctionalTest
         // should be prompted for a login
         try {
             $response = $this->get($draftOnlyPage->URLSegment . '?stage=Stage');
-        } catch (HTTPResponse_Exception $responseException) {
+        } catch (HTTPResponseException $responseException) {
             $response = $responseException->getResponse();
         }
         $this->assertEquals($response->getStatusCode(), '302');

@@ -8,7 +8,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Control\NestedController;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Core\ClassInfo;
@@ -102,7 +102,7 @@ class ModelAsController extends Controller implements NestedController
                 user_error("ModelAsController::getNestedController() returned bad object type '" .
                     get_class($result)."'", E_USER_WARNING);
             }
-        } catch (HTTPResponse_Exception $responseException) {
+        } catch (HTTPResponseException $responseException) {
             $result = $responseException->getResponse();
         }
 

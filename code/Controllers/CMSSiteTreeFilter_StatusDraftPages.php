@@ -3,7 +3,7 @@
 namespace SilverStripe\CMS\Controllers;
 
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\ListInterface;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -21,7 +21,7 @@ class CMSSiteTreeFilter_StatusDraftPages extends CMSSiteTreeFilter
      * Filters out all pages who's status is set to "Draft".
      *
      * @see {@link SiteTree::getStatusFlags()}
-     * @return SS_List
+     * @return ListInterface
      */
     public function getFilteredPages()
     {

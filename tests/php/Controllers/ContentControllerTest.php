@@ -6,7 +6,7 @@ use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\CMS\Controllers\RootURLController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
-use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Control\HTTPResponseException;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Versioned\Versioned;
@@ -122,7 +122,7 @@ class ContentControllerTest extends FunctionalTest
         $this->logInWithPermission('EDITOR');
         try {
             $response = $this->get('/contact/?stage=Stage');
-        } catch (HTTPResponse_Exception $responseException) {
+        } catch (HTTPResponseException $responseException) {
             $response = $responseException->getResponse();
         }
 
